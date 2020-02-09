@@ -11,6 +11,7 @@ class Position:
         yield self.x
         yield self.y
 
+
 class Dimension:
 
     def __init__(self, w, h):
@@ -20,6 +21,7 @@ class Dimension:
     def __iter__(self):
         yield self.w
         yield self.h
+
 
 class Rectangle:
 
@@ -63,7 +65,9 @@ class World:
 
     def __init__(self):
         self.dimension = WORLD_DIMENSION
-        self.h_mover = HorizontalRectangleMover(0, self.dimension[0]-1)
+        self.h_mover = HorizontalRectangleMover(0, self.dimension[0] - 1)
+        self.spaceship = Spaceship(self.h_mover)
+
 
 class Spaceship:
 
