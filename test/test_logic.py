@@ -18,20 +18,19 @@ class TestLogic(TestCase):
 
     def test_spaceship(self):
         world = World()
-        spaceship = Spaceship(world.h_mover)
-
+        spaceship = world.spaceship
         self.assertEqual(SPACESHIP_DIMENSION, tuple(spaceship.rectangle.dimension))
         self.assertEqual(SPACESHIP_TOP_LEFT_STARTING_POINT, tuple(spaceship.rectangle.top_left))
 
-        spaceship.move_left()
+        spaceship.h_mover.move_left(spaceship.rectangle)
         self.assertEqual(SPACESHIP_TOP_LEFT_STARTING_POINT[0]-1, spaceship.rectangle.top_left.x)
 
-        spaceship.move_right()
-        spaceship.move_right()
+        spaceship.h_mover.move_right(spaceship.rectangle)
+        spaceship.h_mover.move_right(spaceship.rectangle)
         self.assertEqual(SPACESHIP_TOP_LEFT_STARTING_POINT[0]+1, spaceship.rectangle.top_left.x)
 
-        for _ in range(5000) : spaceship.move_right()
+        for _ in range(5000) : spaceship.h_mover.move_right(spaceship.rectangle)
         self.assertEqual(world.h_mover.max_x - spaceship.rectangle.dimension.w, spaceship.rectangle.top_left.x)
 
-        for _ in range(5000) : spaceship.move_left()
+        for _ in range(5000) : spaceship.h_mover.move_left(spaceship.rectangle)
         self.assertEqual(world.h_mover.min_x, spaceship.rectangle.top_left.x)
