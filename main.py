@@ -2,7 +2,7 @@ import sys
 
 import pygame
 
-from graphics import Window
+from graphics import Window, WorldPainter
 from logic import World
 
 
@@ -10,9 +10,10 @@ class PySpaceInvaders:
 
     def __init__(self):
         pygame.init()
-        self.window = Window()
-        self.world = World()
 
+        self.world = World()
+        self.world_painter = WorldPainter(self.world)
+        self.window = Window(self.world_painter)
         self._loop()
 
     def _loop(self):
