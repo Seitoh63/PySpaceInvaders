@@ -4,7 +4,7 @@ import time
 
 import pygame
 
-from config import WINDOW_DIMENSION, WINDOW_UPDATE_PERIOD_MS, WINDOW_THREAD_NAME
+from config import WINDOW_DIMENSION, WINDOW_UPDATE_PERIOD_S, WINDOW_THREAD_NAME
 from logic import Spaceship, World, Rectangle
 
 
@@ -56,10 +56,11 @@ class Window:
             if self._stop_event.is_set():
                 break
 
-            self.painter.paint(self.surface)
+            self.surface.fill( (0,0,0) )
 
+            self.painter.paint(self.surface)
             pygame.display.flip()
-            time.sleep(WINDOW_UPDATE_PERIOD_MS)
+            time.sleep(WINDOW_UPDATE_PERIOD_S)
 
         pygame.display.quit()
 

@@ -1,4 +1,5 @@
-from config import SPACESHIP_TOP_LEFT_STARTING_POINT, SPACESHIP_DIMENSION, WORLD_DIMENSION
+from config import SPACESHIP_TOP_LEFT_STARTING_POINT, SPACESHIP_DIMENSION, WORLD_DIMENSION, \
+    SPACESHIP_SPEED_PIXEL_PER_SECOND
 
 
 class Position:
@@ -68,14 +69,22 @@ class World:
         self.h_mover = HorizontalRectangleMover(0, self.dimension[0] - 1)
         self.spaceship = Spaceship(self.h_mover)
 
+    def update(self, dt_ms):
+        self.spaceship.update(dt_ms)
 
 class Spaceship:
+
+    MOVING_LEFT = -1
+    MOVING_RIGHT = 1
+    NOT_MOVING = 0
 
     def __init__(self, h_mover: HorizontalRectangleMover):
         self.rectangle = self._init_spaceship_rect()
         self.h_mover = h_mover
         self.shooter = Shooter()
         self.destructor = Destructor()
+        self.move = Spaceship.NOT_MOVING
+        self.move_amount_in_pixels = 0
 
     def _init_spaceship_rect(self):
         spaceship_top_left = Position(*SPACESHIP_TOP_LEFT_STARTING_POINT)
@@ -84,13 +93,38 @@ class Spaceship:
         return spaceship_rect
 
     def move_left(self):
-        self.h_mover.move_left(self.rectangle)
+        self.move = Spaceship.MOVING_LEFT
 
     def move_right(self):
-        self.h_mover.move_right(self.rectangle)
+        self.move = Spaceship.MOVING_RIGHT
+
+    def is_moving_left(self):
+        return self.move == Spaceship.MOVING_LEFT
+
+    def is_moving_right(self):
+        return self.move == Spaceship.MOVING_RIGHT
+
+    def is_moving(self):
+        return self.is_moving_right() or self.is_moving_left()
+
+    def stop_moving(self):
+        self.move = Spaceship.NOT_MOVING
 
     def fire(self):
         self.shooter.fire()
 
     def destroy(self):
         self.destructor.destroy()
+
+    def update(self, dt_ms):
+
+        if not self.is_moving() :
+            return
+
+        self.move_amount_in_pixels += dt_ms / 1000 * SPACESHIP_SPEED_PIXEL_PER_SECOND
+        while self.move_amount_in_pixels >= 1 :
+            if self.move == Spaceship.MOVING_LEFT :
+                self.h_mover.move_left(self.rectangle)
+            if self.move == Spaceship.MOVING_RIGHT:
+                self.h_mover.move_right(self.rectangle)
+            self.move_amount_in_pixels -= 1
