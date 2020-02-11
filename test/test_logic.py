@@ -22,15 +22,15 @@ class TestLogic(TestCase):
         self.assertEqual(SPACESHIP_DIMENSION, tuple(spaceship.rectangle.dimension))
         self.assertEqual(SPACESHIP_TOP_LEFT_STARTING_POINT, tuple(spaceship.rectangle.top_left))
 
-        spaceship.h_mover.move_left(spaceship.rectangle)
+        spaceship.h_mover.move_left(spaceship.rectangle,1)
         self.assertEqual(SPACESHIP_TOP_LEFT_STARTING_POINT[0]-1, spaceship.rectangle.top_left.x)
 
-        spaceship.h_mover.move_right(spaceship.rectangle)
-        spaceship.h_mover.move_right(spaceship.rectangle)
+        spaceship.h_mover.move_right(spaceship.rectangle,1)
+        spaceship.h_mover.move_right(spaceship.rectangle,1)
         self.assertEqual(SPACESHIP_TOP_LEFT_STARTING_POINT[0]+1, spaceship.rectangle.top_left.x)
 
-        for _ in range(5000) : spaceship.h_mover.move_right(spaceship.rectangle)
+        spaceship.h_mover.move_right(spaceship.rectangle,5000)
         self.assertEqual(world.h_mover.max_x - spaceship.rectangle.dimension.w, spaceship.rectangle.top_left.x)
 
-        for _ in range(5000) : spaceship.h_mover.move_left(spaceship.rectangle)
+        spaceship.h_mover.move_left(spaceship.rectangle,5000)
         self.assertEqual(world.h_mover.min_x, spaceship.rectangle.top_left.x)

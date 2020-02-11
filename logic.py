@@ -37,17 +37,15 @@ class HorizontalRectangleMover:
         self.min_x = min_x
         self.max_x = max_x
 
-    def move_left(self, rectangle: Rectangle):
-        if self.min_x == rectangle.top_left.x:
-            return
+    def move_left(self, rectangle: Rectangle, distance):
+        rectangle.top_left.x -= distance
+        if self.min_x > rectangle.top_left.x:
+            rectangle.top_left.x =  self.min_x
 
-        rectangle.top_left.x -= 1
-
-    def move_right(self, rectangle: Rectangle):
-        if self.max_x == rectangle.top_left.x + rectangle.dimension.w:
-            return
-
-        rectangle.top_left.x += 1
+    def move_right(self, rectangle: Rectangle, distance):
+        rectangle.top_left.x += distance
+        if self.max_x < rectangle.top_left.x + rectangle.dimension.w:
+            rectangle.top_left.x = self.max_x- rectangle.dimension.w
 
 
 class Shooter:
@@ -122,9 +120,10 @@ class Spaceship:
             return
 
         self.move_amount_in_pixels += dt_ms / 1000 * SPACESHIP_SPEED_PIXEL_PER_SECOND
-        while self.move_amount_in_pixels >= 1 :
-            if self.move == Spaceship.MOVING_LEFT :
-                self.h_mover.move_left(self.rectangle)
-            if self.move == Spaceship.MOVING_RIGHT:
-                self.h_mover.move_right(self.rectangle)
-            self.move_amount_in_pixels -= 1
+
+        move_amount_in_pixels_int = int(self.move_amount_in_pixels)
+        if self.move == Spaceship.MOVING_LEFT :
+            self.h_mover.move_left(self.rectangle,move_amount_in_pixels_int )
+        if self.move == Spaceship.MOVING_RIGHT:
+            self.h_mover.move_right(self.rectangle,move_amount_in_pixels_int)
+        self.move_amount_in_pixels -= move_amount_in_pixels_int
