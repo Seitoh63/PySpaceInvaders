@@ -6,6 +6,7 @@ import pygame
 from alien import AlienGenerator
 from config import *
 from spaceship import SpaceshipGenerator
+from tools import time_ms
 
 
 class PySpaceInvaders:
@@ -22,8 +23,8 @@ class PySpaceInvaders:
 
     def play(self):
 
-        self.last_update_time = self._time_ms()
-        self.last_draw_time = self._time_ms()
+        self.last_update_time = time_ms()
+        self.last_draw_time = time_ms()
 
         while True:
             self.update()
@@ -39,9 +40,13 @@ class PySpaceInvaders:
         return events
 
     def update(self):
-        elapsed_time_ms = self._time_ms() - self.last_update_time
+        elapsed_time_ms = time_ms() - self.last_update_time
         if elapsed_time_ms < UPDATE_PERIOD_MS:
             return
+
+        update_count =  elapsed_time_ms//UPDATE_PERIOD_MS
+        if update_count > 1 :
+            print("Skipping " + str(update_count-1) + " updates")
 
         events = self.get_events()
 
@@ -54,9 +59,14 @@ class PySpaceInvaders:
 
     def draw(self):
 
-        elapsed_time_ms = self._time_ms() - self.last_draw_time
+        elapsed_time_ms =  time_ms() - self.last_draw_time
         if elapsed_time_ms < DRAW_PERIOD_MS:
             return
+
+        frame_count =  elapsed_time_ms//DRAW_PERIOD_MS
+        if frame_count > 1 :
+            print("Skipping " + str(frame_count-1) + " frames")
+
 
         self.window_surface.fill((0, 0, 0,))
 
@@ -67,12 +77,11 @@ class PySpaceInvaders:
 
         self.last_draw_time += elapsed_time_ms
 
-    def _time_ms(self):
-        return time.time_ns() // 1000000
-
     def collide(self):
         self._collide_missile_and_aliens()
         self._collide_spaceship_and_aliens()
+        self._collide_spaceship_and_lasers()
+        self._collide_missile_and_lasers()
 
     def _collide_missile_and_aliens(self):
         if self.spaceship is None or self.spaceship.missile is None:
@@ -92,6 +101,27 @@ class PySpaceInvaders:
             if alien.rect.colliderect(self.spaceship.rect):
                 self.spaceship = None
 
+    def _collide_spaceship_and_lasers(self):
+
+        if self.spaceship is None:
+            return
+
+        laser_rect_list = [ laser.rect for laser in self.aliens.lasers]
+        spaceship_rect = self.spaceship.rect
+        if spaceship_rect.collidelist(laser_rect_list) != - 1 :
+            self.spaceship = None
+
+    def _collide_missile_and_lasers(self):
+
+        if self.spaceship is None or self.spaceship.missile is None:
+            return
+
+        laser_rect_list = [ laser.rect for laser in self.aliens.lasers]
+        missile_rect = self.spaceship.missile.rect
+        laser_index = missile_rect.collidelist(laser_rect_list)
+        if laser_index != -1 :
+            self.spaceship.missile = None
+            self.aliens.lasers.pop(laser_index)
 
 if __name__ == "__main__":
     game = PySpaceInvaders()
