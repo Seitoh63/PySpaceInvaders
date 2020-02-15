@@ -1,5 +1,3 @@
-from enum import Enum
-
 import pygame
 
 from config import *
@@ -50,7 +48,7 @@ class Spaceship:
         if self.missile is not None:
             self.missile.update(dt)
 
-            if self.missile.rect.bottom < 0 :
+            if self.missile.rect.bottom < 0:
                 self.missile = None
 
         self._fire()
@@ -113,6 +111,7 @@ class Spaceship:
         )
 
         self.missile = Missile(missile_rect)
+
 
 class SpaceshipGenerator:
 

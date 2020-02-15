@@ -77,7 +77,7 @@ class Aliens:
 
         for laser in self.lasers:
             laser.update(dt)
-            if laser.rect.top > WORLD_DIM[1] :
+            if laser.rect.top > WORLD_DIM[1]:
                 self.lasers.remove(laser)
 
     def draw(self, surf):
@@ -91,22 +91,22 @@ class Aliens:
 
     def _firing_aliens(self):
 
-        #Group the alien by columns
+        # Group the alien by columns
         xs = set(alien.rect.centerx for alien in self.aliens)
         alien_dict = {x: [] for x in xs}
         for alien in self.aliens:
             alien_dict[alien.rect.centerx].append(alien)
 
         # identify lowest alien on column
-        max_aliens= []
-        for x in xs :
+        max_aliens = []
+        for x in xs:
             max_alien = None
             max_alien_y = 0
-            for alien in alien_dict[x] :
-                if alien.rect.bottom > max_alien_y :
+            for alien in alien_dict[x]:
+                if alien.rect.bottom > max_alien_y:
                     max_alien = alien
                     max_alien_y = alien.rect.bottom
-            if max_alien : max_aliens.append(max_alien)
+            if max_alien: max_aliens.append(max_alien)
 
         return max_aliens
 
