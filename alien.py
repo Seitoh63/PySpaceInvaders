@@ -3,7 +3,7 @@ import random
 import pygame
 
 from config import *
-from tools import MovingDirection, time_ms
+from tools import MovingDirection
 
 
 class Laser:
@@ -60,7 +60,7 @@ class Aliens:
     def __init__(self, aliens):
         self.aliens = aliens
         self.lasers = []
-        self.last_firing = time_ms()
+        self.last_firing_delay =0
 
     def __iter__(self):
         return self.aliens.__iter__()
@@ -70,7 +70,7 @@ class Aliens:
 
     def update(self, dt):
 
-        self._fire()
+        self._fire(dt)
 
         for alien in self:
             alien.update(dt)
@@ -110,10 +110,11 @@ class Aliens:
 
         return max_aliens
 
-    def _fire(self):
-        elapsed_time = time_ms() - self.last_firing
-        if elapsed_time > LASER_FIRING_PERIOD_MS:
-            self.last_firing += elapsed_time
+    def _fire(self, dt):
+        self.last_firing_delay += dt
+
+        while self.last_firing_delay > LASER_FIRING_PERIOD_MS:
+            self.last_firing_delay -= LASER_FIRING_PERIOD_MS
             alien = random.choice(self._firing_aliens())
             self.lasers.append(alien.fire())
 

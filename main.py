@@ -5,7 +5,6 @@ import pygame
 from alien import AlienGenerator
 from config import *
 from spaceship import SpaceshipGenerator
-from tools import time_ms
 
 
 class PySpaceInvaders:
@@ -17,17 +16,17 @@ class PySpaceInvaders:
         self.spaceship = SpaceshipGenerator.generate()
         self.aliens = AlienGenerator.generate()
 
-        self.last_update_time = None
-        self.last_draw_time = None
+        self.update_time_delay = 0
+        self.draw_time_delay = 0
 
     def play(self):
 
-        self.last_update_time = time_ms()
-        self.last_draw_time = time_ms()
-
+        clock = pygame.time.Clock()
         while True:
-            self.update()
-            self.draw()
+            dt = clock.tick()
+
+            self.update(dt)
+            self.draw(dt)
 
     def get_events(self):
         events = []
@@ -38,31 +37,32 @@ class PySpaceInvaders:
             events.append(event)
         return events
 
-    def update(self):
-        elapsed_time_ms = time_ms() - self.last_update_time
-        if elapsed_time_ms < UPDATE_PERIOD_MS:
+    def update(self, dt):
+        self.update_time_delay += dt
+
+        if self.update_time_delay < UPDATE_PERIOD_MS:
             return
 
-        update_count = elapsed_time_ms // UPDATE_PERIOD_MS
+        update_count = self.update_time_delay // UPDATE_PERIOD_MS
         if update_count > 1:
             print("Skipping " + str(update_count - 1) + " updates")
 
         events = self.get_events()
 
-        if self.spaceship: self.spaceship.update(elapsed_time_ms, events)
-        self.aliens.update(elapsed_time_ms)
+        if self.spaceship: self.spaceship.update(update_count*UPDATE_PERIOD_MS, events)
+        self.aliens.update(update_count*UPDATE_PERIOD_MS)
 
         self.collide()
 
-        self.last_update_time += elapsed_time_ms
+        self.update_time_delay = self.update_time_delay % UPDATE_PERIOD_MS
 
-    def draw(self):
+    def draw(self, dt):
+        self.draw_time_delay += dt
 
-        elapsed_time_ms = time_ms() - self.last_draw_time
-        if elapsed_time_ms < DRAW_PERIOD_MS:
+        if self.draw_time_delay < DRAW_PERIOD_MS:
             return
 
-        frame_count = elapsed_time_ms // DRAW_PERIOD_MS
+        frame_count = self.draw_time_delay // DRAW_PERIOD_MS
         if frame_count > 1:
             print("Skipping " + str(frame_count - 1) + " frames")
 
@@ -73,7 +73,7 @@ class PySpaceInvaders:
 
         pygame.display.flip()
 
-        self.last_draw_time += elapsed_time_ms
+        self.draw_time_delay = self.draw_time_delay %  DRAW_PERIOD_MS
 
     def collide(self):
         self._collide_missile_and_aliens()
