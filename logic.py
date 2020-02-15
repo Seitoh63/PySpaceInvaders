@@ -1,5 +1,5 @@
 from config import SPACESHIP_TOP_LEFT_STARTING_POINT, SPACESHIP_DIMENSION, WORLD_DIMENSION, \
-    SPACESHIP_SPEED_PIXEL_PER_SECOND
+    SPACESHIP_SPEED_PIXEL_PER_SECOND, MISSILE_DIMENSION, MISSILE_SPEED_PIXEL_PER_SECOND
 
 
 class Position:
@@ -47,11 +47,22 @@ class HorizontalRectangleMover:
         if self.max_x < rectangle.top_left.x + rectangle.dimension.w:
             rectangle.top_left.x = self.max_x- rectangle.dimension.w
 
+class VerticalRectangleMover:
 
-class Shooter:
+    def __init__(self, min_y, max_y):
+        self.min_y = min_y
+        self.max_y = max_y
 
-    def fire(self):
-        pass
+    def move_up(self, rectangle: Rectangle, distance):
+        rectangle.top_left.y -= distance
+        if self.min_y > rectangle.top_left.y:
+            rectangle.top_left.y =  self.min_y
+
+    def move_down(self, rectangle: Rectangle, distance):
+        rectangle.top_left.y += distance
+        if self.max_y < rectangle.top_left.y + rectangle.dimension.h:
+            rectangle.top_left.y = self.max_y - rectangle.dimension.h
+
 
 
 class Destructor:
@@ -65,10 +76,26 @@ class World:
     def __init__(self):
         self.dimension = WORLD_DIMENSION
         self.h_mover = HorizontalRectangleMover(0, self.dimension[0] - 1)
+        self.v_mover = VerticalRectangleMover(0, self.dimension[1] - 1)
         self.spaceship = Spaceship(self.h_mover)
+        self.missiles = []
+
+    def add_missile(self, pos: Position):
+        self.missiles.append(Missile(self.v_mover,pos))
 
     def update(self, dt_ms):
         self.spaceship.update(dt_ms)
+        for missile in self.missiles : missile.update(dt_ms)
+
+class Shooter:
+
+    def __init__(self, world: World):
+        self.world = world
+        self.current_missile = None
+
+    def fire(self, pos: Position):
+        if self.current_missile is None or self.current_missile :
+            self.world.add_missile(pos)
 
 class Spaceship:
 
@@ -127,3 +154,35 @@ class Spaceship:
         if self.move == Spaceship.MOVING_RIGHT:
             self.h_mover.move_right(self.rectangle,move_amount_in_pixels_int)
         self.move_amount_in_pixels -= move_amount_in_pixels_int
+
+class Missile:
+
+    MOVING_UP = -1
+    MOVING_DOWN = 1
+
+    def __init__(self, v_mover: VerticalRectangleMover, starting_pos : Position):
+        self.rectangle = self._init_rect(starting_pos)
+        self.v_mover = v_mover
+        self.move = Missile.MOVING_UP
+        self.move_amount_in_pixels = 0
+        self.alive = True
+
+    def _init_rect(self, starting_pos : Position):
+        top_left = starting_pos
+        dimension = Dimension(*MISSILE_DIMENSION)
+        rect = Rectangle(top_left, dimension)
+        return rect
+
+    def update(self, dt_ms):
+
+        self.move_amount_in_pixels += dt_ms / 1000 * MISSILE_SPEED_PIXEL_PER_SECOND
+
+        move_amount_in_pixels_int = int(self.move_amount_in_pixels)
+        if self.move == Missile.MOVING_UP :
+            self.v_mover.move_up(self.rectangle, move_amount_in_pixels_int )
+        if self.move == Missile.MOVING_DOWN :
+            self.v_mover.move_down(self.rectangle,move_amount_in_pixels_int)
+        self.move_amount_in_pixels -= move_amount_in_pixels_int
+
+    def is_alive(self):
+        return self.alive
