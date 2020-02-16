@@ -60,7 +60,7 @@ class Alien:
 
     def _sprite_shift(self, dt):
         self.last_sprite_shift_delay += dt
-        if self.last_sprite_shift_delay > ALIEN_SPRITE_SHIFT_DELAY_MS :
+        if self.last_sprite_shift_delay > ALIEN_SPRITE_SHIFT_DELAY_MS:
             self.sprite_index += 1
             self.sprite_index %= len(self.sprites)
             self.last_sprite_shift_delay -= ALIEN_SPRITE_SHIFT_DELAY_MS
@@ -72,7 +72,6 @@ class Aliens:
         self.aliens = aliens
         self.lasers = []
         self.last_firing_delay = 0
-
 
     def __iter__(self):
         return self.aliens.__iter__()
@@ -140,24 +139,16 @@ class AlienGenerator:
     def generate():
         aliens = []
 
-        alien_sprites = [
-            [pygame.image.load(SPRITE_PATH + "alien1_frame1.png"),
-             pygame.image.load(SPRITE_PATH + "alien1_frame2.png")],
-            [pygame.image.load(SPRITE_PATH + "alien2_frame1.png"),
-             pygame.image.load(SPRITE_PATH + "alien2_frame2.png")],
-            [pygame.image.load(SPRITE_PATH + "alien3_frame1.png"),
-             pygame.image.load(SPRITE_PATH + "alien3_frame2.png")],
-        ]
+        alien_sprites = [[pygame.image.load(SPRITE_PATH + s) for s in ss] for ss in ALIEN_SPRITE_NAMES]
 
         max_w = max([sprites[0].get_rect().w for sprites in alien_sprites])
         max_row_size = max([len(row) for row in ALIEN_FORMATION])
-        step = WORLD_DIM[0]/max_row_size
-        x0 = (step-max_w)//2
-        xs = [ x0+ (step*i) for i in range(max_row_size) ]
+        step = ALIEN_FORMATION_WIDTH / max_row_size
+        x0 = (step - max_w) // 2 + (WORLD_DIM[0] - ALIEN_FORMATION_WIDTH) // 2
+        xs = [x0 + (step * i) for i in range(max_row_size)]
 
         for row_index, alien_row in enumerate(ALIEN_FORMATION):
             for i, alien_index in enumerate(alien_row):
-
                 sprites = alien_sprites[alien_index - 1]
                 w, h = (sprites[0].get_rect().w, sprites[0].get_rect().h)
 

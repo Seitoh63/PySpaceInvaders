@@ -30,8 +30,9 @@ class Missile:
 
 class Spaceship:
 
-    def __init__(self, rect: pygame.Rect):
+    def __init__(self, rect: pygame.Rect, sprite : pygame.Surface):
         self.rect = rect
+        self.sprite = sprite
         self.moving_direction = MovingDirection.IDLE
         self.move_amount = 0
 
@@ -54,7 +55,7 @@ class Spaceship:
         self._fire()
 
     def draw(self, surf: pygame.Surface):
-        pygame.draw.rect(surf, SPACESHIP_RECT_COLOR, self.rect)
+        surf.blit(self.sprite, self.rect)
 
         if self.missile is not None:
             self.missile.draw(surf)
@@ -117,10 +118,12 @@ class SpaceshipGenerator:
 
     @staticmethod
     def generate():
+        sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME)
+        w,h = sprite.get_rect().w, sprite.get_rect().h
         spaceship_rect = pygame.Rect(
-            (WORLD_DIM[0] - SPACESHIP_RECT_DIM[1]) // 2,
-            WORLD_DIM[1] - SPACESHIP_RECT_DIM[1],
-            SPACESHIP_RECT_DIM[0],
-            SPACESHIP_RECT_DIM[1],
+            (WORLD_DIM[0] - w) // 2,
+            WORLD_DIM[1] - h,
+            w,
+            h,
         )
-        return Spaceship(spaceship_rect)
+        return Spaceship(spaceship_rect, sprite)
