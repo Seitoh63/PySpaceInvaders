@@ -73,7 +73,7 @@ class PySpaceInvaders:
 
         pygame.display.flip()
 
-        self.draw_time_delay = self.draw_time_delay %  DRAW_PERIOD_MS
+        self.draw_time_delay = self.draw_time_delay % DRAW_PERIOD_MS
 
     def collide(self):
         self._collide_missile_and_aliens()
@@ -87,7 +87,7 @@ class PySpaceInvaders:
         missile_rect = self.spaceship.missile.rect
         for alien in self.aliens:
             if missile_rect.colliderect(alien.rect):
-                self.aliens.remove(alien)
+                alien.explode()
                 self.spaceship.missile = None
 
     def _collide_spaceship_and_aliens(self):
