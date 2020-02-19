@@ -40,17 +40,28 @@ class Missile:
     def explode(self):
         self.is_exploded = True
 
+
 class Spaceship:
 
-    def __init__(self, rect: pygame.Rect, sprite: pygame.Surface, missile_explosion_sprite):
+    def __init__(
+            self,
+            rect: pygame.Rect,
+            sprite: pygame.Surface,
+            missile_explosion_sprite: pygame.Surface,
+            shoot_sound: pygame.mixer.Sound
+    ):
+
         self.rect = rect
-        self.sprite = sprite
-        self.missile_explosion_sprite = missile_explosion_sprite
         self.moving_direction = MovingDirection.IDLE
         self.move_amount = 0
 
         self.firing = False
         self.missile = None
+
+        self.sprite = sprite
+        self.missile_explosion_sprite = missile_explosion_sprite
+
+        self.shoot_sound = shoot_sound
 
     def update(self, dt, events):
 
@@ -62,9 +73,11 @@ class Spaceship:
         if self.missile is not None:
             self.missile.update(dt)
 
-            if self.missile.rect.bottom < 0 :
+            if self.missile.rect.top < 0:
+                self.missile.rect.top = 0
                 self.missile.explode()
-            if self.missile.time_since_explosion > EXPLOSION_DURATION_MS :
+
+            if self.missile.time_since_explosion > EXPLOSION_DURATION_MS:
                 self.missile = None
 
         self._fire()
@@ -128,6 +141,8 @@ class Spaceship:
 
         self.missile = Missile(missile_rect, self.missile_explosion_sprite)
 
+        self.shoot_sound.play()
+
 
 class SpaceshipGenerator:
 
@@ -144,4 +159,5 @@ class SpaceshipGenerator:
         )
         spaceship_rect.center = SPACESHIP_STARTING_POSITION
 
-        return Spaceship(spaceship_rect, sprite, missile_explosion_sprite)
+        shoot_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_SHOOT_SOUND)
+        return Spaceship(spaceship_rect, sprite, missile_explosion_sprite,shoot_sound)

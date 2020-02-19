@@ -23,7 +23,7 @@ class Laser:
         self._move(dt)
 
     def _move(self, dt):
-        if self.is_exploded :
+        if self.is_exploded:
             return
         self.move_amount += dt / 1000 * LASER_SPEED_PIXEL_PER_SECOND
         if self.move_amount > 1.:
@@ -31,17 +31,25 @@ class Laser:
             self.move_amount -= int(self.move_amount)
 
     def draw(self, surf: pygame.Surface):
-        if self.is_exploded :
+        if self.is_exploded:
             surf.blit(self.explosion_sprite, self.rect)
-        else :
+        else:
             pygame.draw.rect(surf, LASER_RECT_COLOR, self.rect)
 
     def explode(self):
-        self.is_exploded= True
+        self.is_exploded = True
+
 
 class Alien:
 
-    def __init__(self, rect: pygame.Rect, alien_sprites: list, explosion_sprite, laser_explosion_sprite):
+    def __init__(
+            self,
+            rect: pygame.Rect,
+            alien_sprites: list,
+            explosion_sprite: pygame.Surface,
+            laser_explosion_sprite: pygame.Surface,
+            destroy_sound: pygame.mixer.Sound
+    ):
         self.sprites = alien_sprites
         self.sprite_index = 0
         self.last_sprite_shift_delay = 0
@@ -52,6 +60,8 @@ class Alien:
         self.is_exploded = False
         self.explosion_sprite = explosion_sprite
         self.laser_explosion_sprite = laser_explosion_sprite
+
+        self.destroy_sound = destroy_sound
 
     def update(self, dt, movement):
         if self.is_exploded:
@@ -77,7 +87,9 @@ class Alien:
     def draw(self, surf: pygame.Surface):
 
         if self.is_exploded:
-            surf.blit(self.explosion_sprite, self.rect)
+            explosion_rect = self.explosion_sprite.get_rect()
+            explosion_rect.center = self.rect.center
+            surf.blit(self.explosion_sprite, explosion_rect)
         else:
             surf.blit(self.sprites[self.sprite_index], self.rect)
 
@@ -90,17 +102,23 @@ class Alien:
 
     def explode(self):
         self.is_exploded = True
+        self.destroy_sound.play()
 
 
 class Aliens:
 
-    def __init__(self, aliens):
+    def __init__(self, aliens, move_sound: pygame.mixer.Sound):
         self.aliens = aliens
         self.lasers = []
         self.last_firing_delay = 0
         self.movement_index = 0
         self.last_movement_sequence_delay = 0
         self.move_amount = 0
+
+        self.move_sound = move_sound
+        self.sound_index = 0
+
+        self.move_sound.play(loops=-1)
 
     def __iter__(self):
         return self.aliens.__iter__()
@@ -112,34 +130,12 @@ class Aliens:
 
         self._fire(dt)
 
-        self.last_movement_sequence_delay += dt
-        while self.last_movement_sequence_delay // (ALIEN_MOVE_SEQUENCE_PERIOD_SECOND * 1000) > 1:
-            self.movement_index += 1
-            self.movement_index %= len(ALIEN_MOVE_SEQUENCE)
-            self.last_movement_sequence_delay -= (ALIEN_MOVE_SEQUENCE_PERIOD_SECOND * 1000)
+        self._update_movement_direction(dt)
+        movement = self._get_movement(dt)
 
-        movement = ALIEN_MOVE_SEQUENCE[self.movement_index]
+        self._update_aliens(dt, movement)
+        self._update_lasers(dt)
 
-        self.move_amount += dt / 1000 * ALIEN_SPEED_PIXEL_PER_SECOND
-        move = (0,0)
-        if self.move_amount > 1.:
-            move = (int(self.move_amount) * movement[0], int(self.move_amount) * movement[1])
-            self.move_amount -= int(self.move_amount)
-
-        for alien in self:
-            if alien.delay_since_explosion > EXPLOSION_DURATION_MS:
-                self.remove(alien)
-            alien.update(dt, move)
-
-        for laser in self.lasers:
-            if laser.is_exploded and laser.time_since_explosion > EXPLOSION_DURATION_MS :
-                self.lasers.remove(laser)
-
-            laser.update(dt)
-            if laser.rect.top > WORLD_DIM[1]:
-                laser.rect.left -= laser.explosion_sprite.get_rect().w //2
-                laser.rect.top = WORLD_DIM[1] - laser.explosion_sprite.get_rect().h
-                laser.explode()
 
     def draw(self, surf):
         for alien in self:
@@ -179,6 +175,43 @@ class Aliens:
             alien = random.choice(self._firing_aliens())
             self.lasers.append(alien.fire())
 
+    def _update_movement_direction(self, dt):
+        self.last_movement_sequence_delay += dt
+        while self.last_movement_sequence_delay // (ALIEN_MOVE_SEQUENCE_PERIOD_SECOND * 1000) > 1:
+            self.movement_index += 1
+            self.movement_index %= len(ALIEN_MOVE_SEQUENCE)
+            self.last_movement_sequence_delay -= (ALIEN_MOVE_SEQUENCE_PERIOD_SECOND * 1000)
+
+    def _get_movement(self, dt):
+        movement = ALIEN_MOVE_SEQUENCE[self.movement_index]
+        self.move_amount += dt / 1000 * ALIEN_SPEED_PIXEL_PER_SECOND
+        move = (0, 0)
+        if self.move_amount > 1.:
+            move = (int(self.move_amount) * movement[0], int(self.move_amount) * movement[1])
+            self.move_amount -= int(self.move_amount)
+
+
+
+        return move
+
+    def _update_aliens(self, dt, movement):
+
+        for alien in self:
+            if alien.delay_since_explosion > EXPLOSION_DURATION_MS:
+                self.remove(alien)
+            alien.update(dt, movement)
+
+    def _update_lasers(self, dt):
+        for laser in self.lasers:
+            if laser.is_exploded and laser.time_since_explosion > EXPLOSION_DURATION_MS:
+                self.lasers.remove(laser)
+
+            laser.update(dt)
+            if laser.rect.top > WORLD_DIM[1]:
+                laser.rect.left -= laser.explosion_sprite.get_rect().w // 2
+                laser.rect.top = WORLD_DIM[1] - laser.explosion_sprite.get_rect().h
+                laser.explode()
+
 
 class AlienGenerator:
 
@@ -199,6 +232,8 @@ class AlienGenerator:
         x0 = (step - max_w) // 2 + (WORLD_DIM[0] - ALIEN_FORMATION_WIDTH) // 2
         xs = [x0 + (step * i) for i in range(max_row_size)]
 
+        destroy_sound = pygame.mixer.Sound(SOUND_PATH + ALIEN_DESTROYED_SOUND)
+        move_sound = pygame.mixer.Sound(SOUND_PATH + ALIEN_MOVE_SOUND)
         for row_index, alien_row in enumerate(ALIEN_FORMATION):
             for i, alien_index in enumerate(alien_row):
                 sprites = alien_sprites[alien_index - 1]
@@ -214,6 +249,6 @@ class AlienGenerator:
                     h,
                 )
 
-                aliens.append(Alien(alien_rect, sprites, explosion_sprite, laser_explosion_sprite))
+                aliens.append(Alien(alien_rect, sprites, explosion_sprite, laser_explosion_sprite, destroy_sound))
 
-        return Aliens(aliens)
+        return Aliens(aliens,move_sound)
