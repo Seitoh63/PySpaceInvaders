@@ -71,12 +71,12 @@ class PySpaceInvaders:
 
         self.window_surface.fill((0, 0, 0,))
 
-        if self.spaceship:  self.spaceship.draw(self.window_surface)
-        self.aliens.draw(self.window_surface)
         self.ground.draw(self.window_surface)
-
         for barricade in self.barricades :
             barricade.draw(self.window_surface)
+
+        if self.spaceship:  self.spaceship.draw(self.window_surface)
+        self.aliens.draw(self.window_surface)
 
         pygame.display.flip()
 
@@ -89,6 +89,9 @@ class PySpaceInvaders:
         self._collide_missile_and_lasers()
         self._collide_missile_and_barricades()
         self._collide_laser_and_barricades()
+        self._collide_alien_and_barricades()
+
+
     def _collide_missile_and_aliens(self):
         if self.spaceship is None or self.spaceship.missile is None:
             return
@@ -143,6 +146,11 @@ class PySpaceInvaders:
         for laser in self.aliens.lasers :
             if self._collide_with_barricades(laser) :
                 self.aliens.lasers.remove(laser)
+
+    def _collide_alien_and_barricades(self):
+
+        for alien in self.aliens :
+            self._collide_with_barricades(alien)
 
     def _collide_with_barricades(self, shoot):
 

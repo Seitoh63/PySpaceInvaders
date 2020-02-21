@@ -229,7 +229,7 @@ class AlienGenerator:
         max_w = max([sprites[0].get_rect().w for sprites in alien_sprites])
         max_row_size = max([len(row) for row in ALIEN_FORMATION])
         step = ALIEN_FORMATION_WIDTH / max_row_size
-        x0 = (step - max_w) // 2 + (WORLD_DIM[0] - ALIEN_FORMATION_WIDTH) // 2
+        x0 = (-max_w) // 2 + (WORLD_DIM[0] - ALIEN_FORMATION_WIDTH) // 2
         xs = [x0 + (step * i) for i in range(max_row_size)]
 
         destroy_sound = pygame.mixer.Sound(SOUND_PATH + ALIEN_DESTROYED_SOUND)
@@ -240,7 +240,7 @@ class AlienGenerator:
                 w, h = (sprites[0].get_rect().w, sprites[0].get_rect().h)
 
                 center_x = xs[i]
-                center_y = h + (2 * h * row_index)
+                center_y = h + (2 * h * row_index) + ALIEN_STARTING_POS_Y
 
                 alien_rect = pygame.Rect(
                     center_x - w // 2,
