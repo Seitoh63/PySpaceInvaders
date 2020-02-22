@@ -19,6 +19,7 @@ class PySpaceInvaders:
         self.ground = Ground()
         self.barricades = Barricade.generate_barricades()
 
+
         self.update_time_delay = 0
         self.draw_time_delay = 0
 
@@ -90,6 +91,7 @@ class PySpaceInvaders:
         self._collide_missile_and_barricades()
         self._collide_laser_and_barricades()
         self._collide_alien_and_barricades()
+        self._collide_missile_and_soucoup()
 
 
     def _collide_missile_and_aliens(self):
@@ -100,6 +102,16 @@ class PySpaceInvaders:
             if missile_rect.colliderect(alien.rect):
                 alien.explode()
                 self.spaceship.missile = None
+
+    def _collide_missile_and_soucoup(self):
+        if self.spaceship is None or self.spaceship.missile is None or self.aliens.soucoup is None :
+            return
+
+        missile_rect = self.spaceship.missile.rect
+        soucoup_rect = self.aliens.soucoup.rect
+        if missile_rect.colliderect(soucoup_rect):
+            self.aliens.soucoup.explode()
+            self.spaceship.missile = None
 
     def _collide_spaceship_and_aliens(self):
         for alien in self.aliens:

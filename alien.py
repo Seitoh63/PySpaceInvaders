@@ -6,6 +6,56 @@ from config import *
 from tools import MovingDirection
 
 
+class Soucoup:
+
+    def __init__(self, rect: pygame.Rect, sprite, explosion_sprite, direction: MovingDirection):
+        self.rect = rect
+        self.moving_direction = direction
+        self.move_amount = 0
+
+        self.is_exploded = False
+        self.time_since_explosion = 0
+
+        self.sprite = sprite
+        self.explosion_sprite = explosion_sprite
+
+    def update(self, dt):
+        if self.is_exploded:
+            self.time_since_explosion += dt
+        self._move(dt)
+
+    def _move(self, dt):
+        if self.is_exploded:
+            return
+        self.move_amount += dt / 1000 * SOUCOUP_SPEED_PIXEL_PER_SECOND
+        if self.move_amount > 1.:
+            self.rect.x += int(self.move_amount) * self.moving_direction.value[0][0]
+            self.move_amount -= int(self.move_amount)
+
+    def draw(self, surf: pygame.Surface):
+        if self.is_exploded:
+            surf.blit(self.explosion_sprite, self.rect)
+        else:
+            surf.blit(self.sprite, self.rect)
+
+    def explode(self):
+        self.is_exploded = True
+
+    @staticmethod
+    def generate():
+        sprite = pygame.image.load(SPRITE_PATH + SOUCOUP_SPRITE_NAME)
+        explosion_sprite = pygame.image.load(SPRITE_PATH + ALIEN_EXPLOSION_SPRITE_NAME)
+        rect = sprite.get_rect()
+        rect.top = SOUCOUP_STARTING_POS_Y
+
+        xs = [0, WORLD_DIM[0]-rect.w]
+        dirs = [MovingDirection.RIGHT, MovingDirection.LEFT]
+        index = random.choice([0,1])
+        rect.left = xs[index]
+        direction = dirs[index]
+        return Soucoup(rect, sprite, explosion_sprite, direction)
+
+
 class Laser:
 
     def __init__(self, rect: pygame.Rect, explosion_sprite):
@@ -110,6 +160,12 @@ class Aliens:
     def __init__(self, aliens, move_sound: pygame.mixer.Sound):
         self.aliens = aliens
         self.lasers = []
+
+        self.soucoup = None
+        self.soucoup_sound = pygame.mixer.Sound(SOUND_PATH + SOUCOUP_SOUND)
+
+        self.last_soucoup_appearing_delay = 0
+
         self.last_firing_delay = 0
         self.movement_index = 0
         self.last_movement_sequence_delay = 0
@@ -136,12 +192,32 @@ class Aliens:
         self._update_aliens(dt, movement)
         self._update_lasers(dt)
 
+        if self.soucoup :
+            self.soucoup.update(dt)
+
+            if self.soucoup.rect.x > WORLD_DIM[0] or self.soucoup.rect.right < 0:
+                self.soucoup = None
+                self.soucoup_sound.stop()
+
+        if self.soucoup and self.soucoup.is_exploded  and  self.soucoup.time_since_explosion > EXPLOSION_DURATION_MS :
+            self.soucoup = None
+            self.soucoup_sound.stop()
+
+        self.last_soucoup_appearing_delay += dt
+        if self.last_soucoup_appearing_delay > SOUCOUP_POP_PERIOD_S * 1000 :
+            self.last_soucoup_appearing_delay -= SOUCOUP_POP_PERIOD_S * 1000
+            self.soucoup = Soucoup.generate()
+            self.soucoup_sound.play(loops=-1)
+
 
     def draw(self, surf):
         for alien in self:
             alien.draw(surf)
         for laser in self.lasers:
             laser.draw(surf)
+
+        if self.soucoup :
+            self.soucoup.draw(surf)
 
     def remove(self, alien):
         self.aliens.remove(alien)
@@ -189,8 +265,6 @@ class Aliens:
         if self.move_amount > 1.:
             move = (int(self.move_amount) * movement[0], int(self.move_amount) * movement[1])
             self.move_amount -= int(self.move_amount)
-
-
 
         return move
 
@@ -251,4 +325,4 @@ class AlienGenerator:
 
                 aliens.append(Alien(alien_rect, sprites, explosion_sprite, laser_explosion_sprite, destroy_sound))
 
-        return Aliens(aliens,move_sound)
+        return Aliens(aliens, move_sound)
