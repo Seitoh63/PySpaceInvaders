@@ -6,6 +6,7 @@ from alien import AlienGenerator
 from config import *
 from decor import Ground, Barricade
 from spaceship import SpaceshipGenerator
+from ui import Score
 
 
 class PySpaceInvaders:
@@ -19,6 +20,9 @@ class PySpaceInvaders:
         self.ground = Ground()
         self.barricades = Barricade.generate_barricades()
 
+        digit_sprites = [pygame.image.load(SPRITE_PATH+str(i)+".png") for i in range(0,10)]
+        score_sprite = pygame.image.load(SPRITE_PATH+"score.png")
+        self.score = Score(digit_sprites, score_sprite)
 
         self.update_time_delay = 0
         self.draw_time_delay = 0
@@ -83,9 +87,12 @@ class PySpaceInvaders:
         if self.spaceship:  self.spaceship.draw(self.window_surface)
         self.aliens.draw(self.window_surface)
 
+        self.score.draw(self.window_surface)
+
         pygame.display.flip()
 
         self.draw_time_delay = self.draw_time_delay % DRAW_PERIOD_MS
+
 
     def collide(self):
         self._collide_missile_and_aliens()
@@ -105,6 +112,7 @@ class PySpaceInvaders:
         for alien in self.aliens:
             if missile_rect.colliderect(alien.rect):
                 alien.explode()
+                self.score.score += alien.type * 10
                 self.spaceship.missile = None
 
     def _collide_missile_and_soucoup(self):
@@ -116,6 +124,7 @@ class PySpaceInvaders:
         if missile_rect.colliderect(soucoup_rect):
             self.aliens.soucoup.explode()
             self.spaceship.missile = None
+            self.score.score += 300
 
     def _collide_spaceship_and_aliens(self):
         for alien in self.aliens:

@@ -48,9 +48,9 @@ class Soucoup:
         rect = sprite.get_rect()
         rect.top = SOUCOUP_STARTING_POS_Y
 
-        xs = [0, WORLD_DIM[0]-rect.w]
+        xs = [0, WORLD_DIM[0] - rect.w]
         dirs = [MovingDirection.RIGHT, MovingDirection.LEFT]
-        index = random.choice([0,1])
+        index = random.choice([0, 1])
         rect.left = xs[index]
         direction = dirs[index]
         return Soucoup(rect, sprite, explosion_sprite, direction)
@@ -94,6 +94,7 @@ class Alien:
 
     def __init__(
             self,
+            type: int,
             rect: pygame.Rect,
             alien_sprites: list,
             explosion_sprite: pygame.Surface,
@@ -105,6 +106,8 @@ class Alien:
         self.last_sprite_shift_delay = 0
         self.rect = rect
         self.move_amount = 0
+
+        self.type = type
 
         self.delay_since_explosion = 0
         self.is_exploded = False
@@ -192,23 +195,22 @@ class Aliens:
         self._update_aliens(dt, movement)
         self._update_lasers(dt)
 
-        if self.soucoup :
+        if self.soucoup:
             self.soucoup.update(dt)
 
             if self.soucoup.rect.x > WORLD_DIM[0] or self.soucoup.rect.right < 0:
                 self.soucoup = None
                 self.soucoup_sound.stop()
 
-        if self.soucoup and self.soucoup.is_exploded  and  self.soucoup.time_since_explosion > EXPLOSION_DURATION_MS :
+        if self.soucoup and self.soucoup.is_exploded and self.soucoup.time_since_explosion > EXPLOSION_DURATION_MS:
             self.soucoup = None
             self.soucoup_sound.stop()
 
         self.last_soucoup_appearing_delay += dt
-        if self.last_soucoup_appearing_delay > SOUCOUP_POP_PERIOD_S * 1000 :
+        if self.last_soucoup_appearing_delay > SOUCOUP_POP_PERIOD_S * 1000:
             self.last_soucoup_appearing_delay -= SOUCOUP_POP_PERIOD_S * 1000
             self.soucoup = Soucoup.generate()
             self.soucoup_sound.play(loops=-1)
-
 
     def draw(self, surf):
         for alien in self:
@@ -216,7 +218,7 @@ class Aliens:
         for laser in self.lasers:
             laser.draw(surf)
 
-        if self.soucoup :
+        if self.soucoup:
             self.soucoup.draw(surf)
 
     def remove(self, alien):
@@ -246,8 +248,12 @@ class Aliens:
     def _fire(self, dt):
         self.last_firing_delay += dt
 
-        while self.last_firing_delay > ALIEN_FIRING_PERIOD_MS:
+        while self.last_firing_delay > ALIEN_FIRING_PERIOD_MS :
+
             self.last_firing_delay -= ALIEN_FIRING_PERIOD_MS
+            firing_aliens = self._firing_aliens()
+            if not firing_aliens:
+                return
             alien = random.choice(self._firing_aliens())
             self.lasers.append(alien.fire())
 
@@ -323,6 +329,7 @@ class AlienGenerator:
                     h,
                 )
 
-                aliens.append(Alien(alien_rect, sprites, explosion_sprite, laser_explosion_sprite, destroy_sound))
+                aliens.append(
+                    Alien(alien_index, alien_rect, sprites, explosion_sprite, laser_explosion_sprite, destroy_sound))
 
         return Aliens(aliens, move_sound)
