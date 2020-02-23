@@ -48,7 +48,10 @@ class Spaceship:
             rect: pygame.Rect,
             sprite: pygame.Surface,
             missile_explosion_sprite: pygame.Surface,
-            shoot_sound: pygame.mixer.Sound
+            destruction_sprite : pygame.Surface,
+            shoot_sound: pygame.mixer.Sound,
+            destroy_sound: pygame.mixer.Sound,
+
     ):
 
         self.rect = rect
@@ -60,30 +63,46 @@ class Spaceship:
 
         self.sprite = sprite
         self.missile_explosion_sprite = missile_explosion_sprite
+        self.destruction_sprite = destruction_sprite
 
+        self.delay_since_explosion = 0
+
+        self.destroy_sound = destroy_sound
         self.shoot_sound = shoot_sound
+
+        self.is_destroyed = False
 
     def update(self, dt, events):
 
         for event in events:
             self._handle_event(event)
 
-        self._move(dt)
 
-        if self.missile is not None:
-            self.missile.update(dt)
+        if not self.is_destroyed :
+            self._move(dt)
 
-            if self.missile.rect.top < 0:
-                self.missile.rect.top = 0
-                self.missile.explode()
+            if self.missile is not None:
+                self.missile.update(dt)
 
-            if self.missile.time_since_explosion > EXPLOSION_DURATION_MS:
-                self.missile = None
+                if self.missile.rect.top < 0:
+                    self.missile.rect.top = 0
+                    self.missile.explode()
 
-        self._fire()
+                if self.missile.time_since_explosion > EXPLOSION_DURATION_MS:
+                    self.missile = None
+
+            self._fire()
+        else :
+            self.delay_since_explosion += dt
 
     def draw(self, surf: pygame.Surface):
-        surf.blit(self.sprite, self.rect)
+
+        if not self.is_destroyed :
+            surf.blit(self.sprite, self.rect)
+
+        else :
+            self.destruction_sprite = pygame.transform.flip(self.destruction_sprite, True, False)
+            surf.blit(self.destruction_sprite,self.rect)
 
         if self.missile is not None:
             self.missile.draw(surf)
@@ -143,6 +162,10 @@ class Spaceship:
 
         self.shoot_sound.play()
 
+    def destroy(self):
+        self.is_destroyed = True
+        self.destroy_sound.play()
+
 
 class SpaceshipGenerator:
 
@@ -150,6 +173,7 @@ class SpaceshipGenerator:
     def generate():
         missile_explosion_sprite = pygame.image.load(SPRITE_PATH + MISSILE_EXPLOSION_SPRITE_NAME)
         sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME)
+        destruction_sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_DESTRUCTION_SPRITE_NAME)
         w, h = sprite.get_rect().w, sprite.get_rect().h
         spaceship_rect = pygame.Rect(
             0,
@@ -160,4 +184,5 @@ class SpaceshipGenerator:
         spaceship_rect.center = SPACESHIP_STARTING_POSITION
 
         shoot_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_SHOOT_SOUND)
-        return Spaceship(spaceship_rect, sprite, missile_explosion_sprite,shoot_sound)
+        destruction_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_DESTRUCTION_SOUND)
+        return Spaceship(spaceship_rect, sprite, missile_explosion_sprite, destruction_sprite,shoot_sound, destruction_sound)

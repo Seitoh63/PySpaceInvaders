@@ -53,7 +53,11 @@ class PySpaceInvaders:
 
         events = self.get_events()
 
-        if self.spaceship: self.spaceship.update(update_count*UPDATE_PERIOD_MS, events)
+        if self.spaceship:
+            self.spaceship.update(update_count*UPDATE_PERIOD_MS, events)
+            if self.spaceship.is_destroyed and self.spaceship.delay_since_explosion > SPACESHIP_EXPLOSION_DURATION_MS :
+                self.spaceship = None
+
         self.aliens.update(update_count*UPDATE_PERIOD_MS)
 
         self.collide()
@@ -120,7 +124,7 @@ class PySpaceInvaders:
                 return
 
             if alien.rect.colliderect(self.spaceship.rect):
-                self.spaceship = None
+                self.spaceship.destroy()
 
     def _collide_spaceship_and_lasers(self):
 
@@ -130,7 +134,7 @@ class PySpaceInvaders:
         laser_rect_list = [laser.rect for laser in self.aliens.lasers]
         spaceship_rect = self.spaceship.rect
         if spaceship_rect.collidelist(laser_rect_list) != - 1:
-            self.spaceship = None
+            self.spaceship.destroy()
 
     def _collide_missile_and_lasers(self):
 
