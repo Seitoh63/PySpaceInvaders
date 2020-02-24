@@ -20,8 +20,8 @@ class PySpaceInvaders:
         self.ground = Ground()
         self.barricades = Barricade.generate_barricades()
 
-        digit_sprites = [pygame.image.load(SPRITE_PATH+str(i)+".png") for i in range(0,10)]
-        score_sprite = pygame.image.load(SPRITE_PATH+"score.png")
+        digit_sprites = [pygame.image.load(SPRITE_PATH + str(i) + ".png") for i in range(0, 10)]
+        score_sprite = pygame.image.load(SPRITE_PATH + "score.png")
         self.score = Score(digit_sprites, score_sprite)
 
         self.update_time_delay = 0
@@ -58,11 +58,11 @@ class PySpaceInvaders:
         events = self.get_events()
 
         if self.spaceship:
-            self.spaceship.update(update_count*UPDATE_PERIOD_MS, events)
-            if self.spaceship.is_destroyed and self.spaceship.delay_since_explosion > SPACESHIP_EXPLOSION_DURATION_MS :
+            self.spaceship.update(update_count * UPDATE_PERIOD_MS, events)
+            if self.spaceship.is_destroyed and self.spaceship.delay_since_explosion > SPACESHIP_EXPLOSION_DURATION_MS:
                 self.spaceship = None
 
-        self.aliens.update(update_count*UPDATE_PERIOD_MS)
+        self.aliens.update(update_count * UPDATE_PERIOD_MS)
 
         self.collide()
 
@@ -81,7 +81,7 @@ class PySpaceInvaders:
         self.window_surface.fill((0, 0, 0,))
 
         self.ground.draw(self.window_surface)
-        for barricade in self.barricades :
+        for barricade in self.barricades:
             barricade.draw(self.window_surface)
 
         if self.spaceship:  self.spaceship.draw(self.window_surface)
@@ -93,7 +93,6 @@ class PySpaceInvaders:
 
         self.draw_time_delay = self.draw_time_delay % DRAW_PERIOD_MS
 
-
     def collide(self):
         self._collide_missile_and_aliens()
         self._collide_spaceship_and_aliens()
@@ -103,7 +102,6 @@ class PySpaceInvaders:
         self._collide_laser_and_barricades()
         self._collide_alien_and_barricades()
         self._collide_missile_and_soucoup()
-
 
     def _collide_missile_and_aliens(self):
         if self.spaceship is None or self.spaceship.missile is None:
@@ -116,7 +114,7 @@ class PySpaceInvaders:
                 self.spaceship.missile = None
 
     def _collide_missile_and_soucoup(self):
-        if self.spaceship is None or self.spaceship.missile is None or self.aliens.soucoup is None :
+        if self.spaceship is None or self.spaceship.missile is None or self.aliens.soucoup is None:
             return
 
         missile_rect = self.spaceship.missile.rect
@@ -162,19 +160,18 @@ class PySpaceInvaders:
         if self.spaceship is None or self.spaceship.missile is None:
             return
 
-        if self._collide_with_barricades(self.spaceship.missile) :
+        if self._collide_with_barricades(self.spaceship.missile):
             self.spaceship.missile = None
-
 
     def _collide_laser_and_barricades(self):
 
-        for laser in self.aliens.lasers :
-            if self._collide_with_barricades(laser) :
+        for laser in self.aliens.lasers:
+            if self._collide_with_barricades(laser):
                 self.aliens.lasers.remove(laser)
 
     def _collide_alien_and_barricades(self):
 
-        for alien in self.aliens :
+        for alien in self.aliens:
             self._collide_with_barricades(alien)
 
     def _collide_with_barricades(self, shoot):
@@ -191,7 +188,7 @@ class PySpaceInvaders:
             if collision_point:
                 cx, cy = collision_point
                 for x in range(cx - r, cx + r + 1, 1):
-                    for y in range(cy - r, cy + r + 1 , 1):
+                    for y in range(cy - r, cy + r + 1, 1):
                         if x < 0 or x >= barricade.rect.w or y < 0 or y >= barricade.rect.h:
                             continue
                         barricade.mask.set_at((x, y), 0)
@@ -206,6 +203,7 @@ class PySpaceInvaders:
                 return True
 
         return False
+
 
 if __name__ == "__main__":
     game = PySpaceInvaders()

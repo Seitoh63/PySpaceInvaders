@@ -48,7 +48,7 @@ class Spaceship:
             rect: pygame.Rect,
             sprite: pygame.Surface,
             missile_explosion_sprite: pygame.Surface,
-            destruction_sprite : pygame.Surface,
+            destruction_sprite: pygame.Surface,
             shoot_sound: pygame.mixer.Sound,
             destroy_sound: pygame.mixer.Sound,
 
@@ -77,8 +77,7 @@ class Spaceship:
         for event in events:
             self._handle_event(event)
 
-
-        if not self.is_destroyed :
+        if not self.is_destroyed:
             self._move(dt)
 
             if self.missile is not None:
@@ -92,17 +91,17 @@ class Spaceship:
                     self.missile = None
 
             self._fire()
-        else :
+        else:
             self.delay_since_explosion += dt
 
     def draw(self, surf: pygame.Surface):
 
-        if not self.is_destroyed :
+        if not self.is_destroyed:
             surf.blit(self.sprite, self.rect)
 
-        else :
+        else:
             self.destruction_sprite = pygame.transform.flip(self.destruction_sprite, True, False)
-            surf.blit(self.destruction_sprite,self.rect)
+            surf.blit(self.destruction_sprite, self.rect)
 
         if self.missile is not None:
             self.missile.draw(surf)
@@ -185,4 +184,5 @@ class SpaceshipGenerator:
 
         shoot_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_SHOOT_SOUND)
         destruction_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_DESTRUCTION_SOUND)
-        return Spaceship(spaceship_rect, sprite, missile_explosion_sprite, destruction_sprite,shoot_sound, destruction_sound)
+        return Spaceship(spaceship_rect, sprite, missile_explosion_sprite, destruction_sprite, shoot_sound,
+                         destruction_sound)

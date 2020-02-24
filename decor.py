@@ -1,5 +1,5 @@
 import pygame
-import numpy
+
 from config import *
 
 
@@ -17,7 +17,7 @@ class Barricade:
     def __init__(self, rect: pygame.Rect, barricade_sprite: pygame.Surface):
         self.sprite = barricade_sprite
         self.rect = rect
-        self.mask = pygame.mask.from_threshold(self.sprite, (0, 0, 0, 0), (1,1,1,255))
+        self.mask = pygame.mask.from_threshold(self.sprite, (0, 0, 0, 0), (1, 1, 1, 255))
         self.mask.invert()
 
     def draw(self, surf: pygame.Surface):
@@ -27,10 +27,10 @@ class Barricade:
     def generate_barricades():
         barricades = []
 
-        for b_pos in BARRICADE_POSITIONS :
+        for b_pos in BARRICADE_POSITIONS:
             surf = pygame.image.load(SPRITE_PATH + BARRICADE_SPRITE_NAME)
             rect = surf.get_rect()
             rect.center = b_pos
-            barricades.append(Barricade(rect,surf))
+            barricades.append(Barricade(rect, surf))
 
         return barricades

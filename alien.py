@@ -161,23 +161,28 @@ class Alien:
 class Aliens:
 
     def __init__(self, aliens, move_sound: pygame.mixer.Sound):
+
         self.aliens = aliens
+
+        x0 = min(alien.rect.left for alien in self.aliens)
+        y0 = min(alien.rect.top for alien in self.aliens)
+        x1 = max(alien.rect.right for alien in self.aliens)
+        y1 = max(alien.rect.bottom for alien in self.aliens)
+        self.rect = pygame.Rect(x0, y0, x1 - x0, y1 - y0)
+
+        self.last_firing_delay = 0
+        self.movement_direction = MovingDirection.RIGHT
+        self.last_movement_sequence_delay = 0
+        self.move_amount = 0
+        self.move_sound = move_sound
+        self.sound_index = 0
+        self.move_sound.play(loops=-1)
+
         self.lasers = []
 
         self.soucoup = None
         self.soucoup_sound = pygame.mixer.Sound(SOUND_PATH + SOUCOUP_SOUND)
-
         self.last_soucoup_appearing_delay = 0
-
-        self.last_firing_delay = 0
-        self.movement_index = 0
-        self.last_movement_sequence_delay = 0
-        self.move_amount = 0
-
-        self.move_sound = move_sound
-        self.sound_index = 0
-
-        self.move_sound.play(loops=-1)
 
     def __iter__(self):
         return self.aliens.__iter__()
@@ -189,10 +194,20 @@ class Aliens:
 
         self._fire(dt)
 
-        self._update_movement_direction(dt)
-        movement = self._get_movement(dt)
+        move = self._get_movement(dt)
 
-        self._update_aliens(dt, movement)
+        self.rect.left += move[0]
+        self.rect.top += move[1]
+
+        if self.movement_direction == MovingDirection.RIGHT and self.rect.right >= WORLD_DIM[0]:
+            move = (move[0] - (self.rect.right - WORLD_DIM[0]), move[1] + self.aliens[0].rect.h)
+            self.movement_direction = MovingDirection.LEFT
+
+        if self.movement_direction == MovingDirection.LEFT and self.rect.left <= 0:
+            move = (move[0] - self.rect.left, move[1] + self.aliens[0].rect.h)
+            self.movement_direction = MovingDirection.RIGHT
+
+        self._update_aliens(dt, move)
         self._update_lasers(dt)
 
         if self.soucoup:
@@ -248,7 +263,7 @@ class Aliens:
     def _fire(self, dt):
         self.last_firing_delay += dt
 
-        while self.last_firing_delay > ALIEN_FIRING_PERIOD_MS :
+        while self.last_firing_delay > ALIEN_FIRING_PERIOD_MS:
 
             self.last_firing_delay -= ALIEN_FIRING_PERIOD_MS
             firing_aliens = self._firing_aliens()
@@ -257,21 +272,13 @@ class Aliens:
             alien = random.choice(self._firing_aliens())
             self.lasers.append(alien.fire())
 
-    def _update_movement_direction(self, dt):
-        self.last_movement_sequence_delay += dt
-        while self.last_movement_sequence_delay // (ALIEN_MOVE_SEQUENCE_PERIOD_SECOND * 1000) > 1:
-            self.movement_index += 1
-            self.movement_index %= len(ALIEN_MOVE_SEQUENCE)
-            self.last_movement_sequence_delay -= (ALIEN_MOVE_SEQUENCE_PERIOD_SECOND * 1000)
-
     def _get_movement(self, dt):
-        movement = ALIEN_MOVE_SEQUENCE[self.movement_index]
+        movement = self.movement_direction.value[0]
         self.move_amount += dt / 1000 * ALIEN_SPEED_PIXEL_PER_SECOND
         move = (0, 0)
         if self.move_amount > 1.:
             move = (int(self.move_amount) * movement[0], int(self.move_amount) * movement[1])
             self.move_amount -= int(self.move_amount)
-
         return move
 
     def _update_aliens(self, dt, movement):
@@ -308,8 +315,8 @@ class AlienGenerator:
 
         max_w = max([sprites[0].get_rect().w for sprites in alien_sprites])
         max_row_size = max([len(row) for row in ALIEN_FORMATION])
-        step = ALIEN_FORMATION_WIDTH / max_row_size
-        x0 = (-max_w) // 2 + (WORLD_DIM[0] - ALIEN_FORMATION_WIDTH) // 2
+        step = ALIEN_FORMATION_WIDTH_PIXELS / max_row_size
+        x0 = (-max_w) // 2 + (WORLD_DIM[0] - ALIEN_FORMATION_WIDTH_PIXELS) // 2
         xs = [x0 + (step * i) for i in range(max_row_size)]
 
         destroy_sound = pygame.mixer.Sound(SOUND_PATH + ALIEN_DESTROYED_SOUND)
