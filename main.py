@@ -6,7 +6,7 @@ from alien import AlienGenerator
 from config import *
 from decor import Ground, Barricade
 from spaceship import SpaceshipGenerator
-from ui import Score, LifeCounter
+from ui import Score, LifeCounter, HighScore
 
 
 class PySpaceInvaders:
@@ -20,10 +20,11 @@ class PySpaceInvaders:
         self.ground = Ground()
         self.barricades = Barricade.generate_barricades()
 
-
         digit_sprites = [pygame.image.load(SPRITE_PATH + str(i) + ".png") for i in range(0, 10)]
         score_sprite = pygame.image.load(SPRITE_PATH + "score.png")
+        high_score_sprite = pygame.image.load(SPRITE_PATH + "high_score.png")
         self.score = Score(digit_sprites, score_sprite)
+        self.high_score = HighScore(digit_sprites, high_score_sprite)
         self.life_counter = LifeCounter(STARTING_LIFE_COUNT, pygame.image.load(SPRITE_PATH+SPACESHIP_SPRITE_NAME), digit_sprites)
 
 
@@ -97,7 +98,7 @@ class PySpaceInvaders:
         self.aliens.draw(self.window_surface)
 
         self.score.draw(self.window_surface)
-
+        self.high_score.draw(self.window_surface)
         self.life_counter.draw(self.window_surface)
 
         pygame.display.flip()
