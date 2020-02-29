@@ -104,6 +104,7 @@ class Alien:
         self.sprites = alien_sprites
         self.sprite_index = 0
         self.last_sprite_shift_delay = 0
+        self.shift_sprite_delay = ALIEN_SPRITE_SHIFT_DELAY_MS
         self.rect = rect
         self.move_amount = 0
 
@@ -148,10 +149,10 @@ class Alien:
 
     def _sprite_shift(self, dt):
         self.last_sprite_shift_delay += dt
-        if self.last_sprite_shift_delay > ALIEN_SPRITE_SHIFT_DELAY_MS:
+        if self.last_sprite_shift_delay > self.shift_sprite_delay:
             self.sprite_index += 1
             self.sprite_index %= len(self.sprites)
-            self.last_sprite_shift_delay -= ALIEN_SPRITE_SHIFT_DELAY_MS
+            self.last_sprite_shift_delay -= self.shift_sprite_delay
 
     def explode(self):
         self.is_exploded = True
@@ -163,20 +164,20 @@ class Aliens:
     def __init__(self, aliens, move_sound: pygame.mixer.Sound):
 
         self.aliens = aliens
-
-        x0 = min(alien.rect.left for alien in self.aliens)
-        y0 = min(alien.rect.top for alien in self.aliens)
-        x1 = max(alien.rect.right for alien in self.aliens)
-        y1 = max(alien.rect.bottom for alien in self.aliens)
-        self.rect = pygame.Rect(x0, y0, x1 - x0, y1 - y0)
+        self.rect = None
+        self._update_rect()
 
         self.last_firing_delay = 0
         self.movement_direction = MovingDirection.RIGHT
         self.last_movement_sequence_delay = 0
+        self.movement_speed = ALIEN_SPEED_PIXEL_PER_SECOND
         self.move_amount = 0
         self.move_sound = move_sound
         self.sound_index = 0
         self.move_sound.play(loops=-1)
+
+        self.starting_alien_count = len(aliens)
+        self.acceleration_step = 1
 
         self.lasers = []
 
@@ -194,6 +195,8 @@ class Aliens:
 
         self._fire(dt)
 
+        self._accelerate()
+        self._update_rect()
         move = self._get_movement(dt)
 
         self.rect.left += move[0]
@@ -274,7 +277,7 @@ class Aliens:
 
     def _get_movement(self, dt):
         movement = self.movement_direction.value[0]
-        self.move_amount += dt / 1000 * ALIEN_SPEED_PIXEL_PER_SECOND
+        self.move_amount += dt / 1000 * self.movement_speed
         move = (0, 0)
         if self.move_amount > 1.:
             move = (int(self.move_amount) * movement[0], int(self.move_amount) * movement[1])
@@ -299,6 +302,21 @@ class Aliens:
                 laser.rect.top = WORLD_DIM[1] - laser.explosion_sprite.get_rect().h
                 laser.explode()
 
+    def _accelerate(self):
+        if not self.acceleration_step < ALIEN_ACCELERATION_STEP_COUNT :
+            return
+        if len(self.aliens) < self.starting_alien_count // (2 ** self.acceleration_step):
+            self.acceleration_step += 1
+            self.movement_speed *= 2
+            for alien in self.aliens :
+                alien.shift_sprite_delay = alien.shift_sprite_delay//2
+
+    def _update_rect(self):
+        x0 = min(alien.rect.left for alien in self.aliens)
+        y0 = min(alien.rect.top for alien in self.aliens)
+        x1 = max(alien.rect.right for alien in self.aliens)
+        y1 = max(alien.rect.bottom for alien in self.aliens)
+        self.rect = pygame.Rect(x0, y0, x1 - x0, y1 - y0)
 
 class AlienGenerator:
 

@@ -25,8 +25,8 @@ class PySpaceInvaders:
         high_score_sprite = pygame.image.load(SPRITE_PATH + "high_score.png")
         self.score = Score(digit_sprites, score_sprite)
         self.high_score = HighScore(digit_sprites, high_score_sprite)
-        self.life_counter = LifeCounter(STARTING_LIFE_COUNT, pygame.image.load(SPRITE_PATH+SPACESHIP_SPRITE_NAME), digit_sprites)
-
+        self.life_counter = LifeCounter(STARTING_LIFE_COUNT, pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME),
+                                        digit_sprites)
 
         self.update_time_delay = 0
         self.draw_time_delay = 0
@@ -66,12 +66,15 @@ class PySpaceInvaders:
             if self.spaceship.is_destroyed and self.spaceship.delay_since_explosion > SPACESHIP_EXPLOSION_DURATION_MS:
                 self.spaceship = None
 
-        else :
+        else:
 
-            if self.life_counter.life_count > 0 :
+            if self.life_counter.life_count > 0:
                 self.life_counter.life_count -= 1
                 self.spaceship = SpaceshipGenerator.generate()
 
+        if not self.aliens.aliens:
+            self.aliens.move_sound.stop()
+            self.aliens = AlienGenerator.generate()
         self.aliens.update(update_count * UPDATE_PERIOD_MS)
 
         self.collide()
