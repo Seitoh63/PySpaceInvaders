@@ -23,7 +23,14 @@ SOUCOUP_SPRITE_NAME = "soucoup.png"
 ### SOUND ###
 SOUND_PATH = "sound/"
 ALIEN_DESTROYED_SOUND = "alien_destroyed.wav"
-ALIEN_MOVE_SOUND = "fastinvader.wav"
+ALIEN_MOVE_SOUNDS = [
+    "invader_movements1.wav",
+    "invader_movements2.wav",
+    "invader_movements3.wav",
+    "invader_movements4.wav",
+    "invader_movements5.wav",
+    "invader_movements6.wav"
+]
 SPACESHIP_SHOOT_SOUND = "shoot.wav"
 SPACESHIP_DESTRUCTION_SOUND = "explosion.wav"
 SOUCOUP_SOUND = "soucoup.wav"
@@ -49,7 +56,6 @@ ALIEN_SPEED_PIXEL_PER_SECOND = 10
 ALIEN_FIRING_PERIOD_MS = 1000
 ALIEN_SPRITE_SHIFT_DELAY_MS = 500
 ALIEN_STARTING_POS_Y = WORLD_DIM[1] * 3 // 10
-ALIEN_ACCELERATION_STEP_COUNT = 5
 
 SOUCOUP_SPEED_PIXEL_PER_SECOND = 100
 SOUCOUP_STARTING_POS_Y = WORLD_DIM[1] * 2 // 10

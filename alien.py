@@ -161,7 +161,7 @@ class Alien:
 
 class Aliens:
 
-    def __init__(self, aliens, move_sound: pygame.mixer.Sound):
+    def __init__(self, aliens, move_sounds: list):
 
         self.aliens = aliens
         self.rect = None
@@ -172,12 +172,12 @@ class Aliens:
         self.last_movement_sequence_delay = 0
         self.movement_speed = ALIEN_SPEED_PIXEL_PER_SECOND
         self.move_amount = 0
-        self.move_sound = move_sound
+        self.move_sounds = move_sounds
         self.sound_index = 0
-        self.move_sound.play(loops=-1)
+        self.move_sounds[0].play(loops=-1)
 
         self.starting_alien_count = len(aliens)
-        self.acceleration_step = 1
+        self.acceleration_step = 0
 
         self.lasers = []
 
@@ -303,11 +303,13 @@ class Aliens:
                 laser.explode()
 
     def _accelerate(self):
-        if not self.acceleration_step < ALIEN_ACCELERATION_STEP_COUNT :
+        if self.acceleration_step >= len(self.move_sounds) :
             return
-        if len(self.aliens) < self.starting_alien_count // (2 ** self.acceleration_step):
+        if len(self.aliens) < self.starting_alien_count // (2 ** (self.acceleration_step+1)):
             self.acceleration_step += 1
             self.movement_speed *= 2
+            self.move_sounds[self.acceleration_step-1].stop()
+            self.move_sounds[self.acceleration_step].play(loops=-1)
             for alien in self.aliens :
                 alien.shift_sprite_delay = alien.shift_sprite_delay//2
 
@@ -338,7 +340,7 @@ class AlienGenerator:
         xs = [x0 + (step * i) for i in range(max_row_size)]
 
         destroy_sound = pygame.mixer.Sound(SOUND_PATH + ALIEN_DESTROYED_SOUND)
-        move_sound = pygame.mixer.Sound(SOUND_PATH + ALIEN_MOVE_SOUND)
+        move_sounds = [ pygame.mixer.Sound(SOUND_PATH + sound) for sound in ALIEN_MOVE_SOUNDS]
         for row_index, alien_row in enumerate(ALIEN_FORMATION):
             for i, alien_index in enumerate(alien_row):
                 sprites = alien_sprites[alien_index - 1]
@@ -357,4 +359,4 @@ class AlienGenerator:
                 aliens.append(
                     Alien(alien_index, alien_rect, sprites, explosion_sprite, laser_explosion_sprite, destroy_sound))
 
-        return Aliens(aliens, move_sound)
+        return Aliens(aliens, move_sounds)

@@ -73,7 +73,7 @@ class PySpaceInvaders:
                 self.spaceship = SpaceshipGenerator.generate()
 
         if not self.aliens.aliens:
-            self.aliens.move_sound.stop()
+            self.aliens.move_sounds[self.aliens.acceleration_step].stop()
             self.aliens = AlienGenerator.generate()
         self.aliens.update(update_count * UPDATE_PERIOD_MS)
 
