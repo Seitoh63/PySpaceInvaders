@@ -67,6 +67,8 @@ class Laser:
         self.time_since_explosion = 0
         self.explosion_sprite = explosion_sprite
 
+        self.h_bar_y = 0
+
     def update(self, dt):
         if self.is_exploded:
             self.time_since_explosion += dt
@@ -85,6 +87,12 @@ class Laser:
             surf.blit(self.explosion_sprite, self.rect)
         else:
             pygame.draw.rect(surf, LASER_RECT_COLOR, self.rect)
+            pygame.draw.rect(
+                surf,
+                LASER_RECT_COLOR,
+                pygame.Rect((self.rect.left-3, self.rect.top+self.h_bar_y),LASER_H_BAR_DIM)
+            )
+            self.h_bar_y = (self.h_bar_y + LASER_H_BAR_MOVE_SPEED ) % self.rect.h
 
     def explode(self):
         self.is_exploded = True
