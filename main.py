@@ -1,3 +1,5 @@
+import math
+import random
 import sys
 
 import pygame
@@ -175,26 +177,25 @@ class PySpaceInvaders:
         if self.spaceship is None or self.spaceship.missile is None:
             return
 
-        if self._collide_with_barricades(self.spaceship.missile):
+        if self._collide_with_barricades(self.spaceship.missile, MISSILE_BARRICADE_EXPLOSION_RADIUS):
             self.spaceship.missile = None
 
     def _collide_laser_and_barricades(self):
 
         for laser in self.aliens.lasers:
-            if self._collide_with_barricades(laser):
+            if self._collide_with_barricades(laser, LASER_BARRICADE_EXPLOSION_RADIUS):
                 self.aliens.lasers.remove(laser)
 
     def _collide_alien_and_barricades(self):
 
         for alien in self.aliens:
-            self._collide_with_barricades(alien)
+            self._collide_with_barricades(alien, LASER_BARRICADE_EXPLOSION_RADIUS)
 
-    def _collide_with_barricades(self, shoot):
+    def _collide_with_barricades(self, shoot, radius):
 
         w, h = (shoot.rect.w, shoot.rect.h)
         x, y = (shoot.rect.x, shoot.rect.y)
         shoot_mask = pygame.Mask((w, h), fill=True)
-        r = BARRICADE_EXPLOSION_RADIUS
 
         for barricade in self.barricades:
             offset = (x - barricade.rect.x, y - barricade.rect.y)
@@ -202,11 +203,17 @@ class PySpaceInvaders:
 
             if collision_point:
                 cx, cy = collision_point
-                for x in range(cx - r, cx + r + 1, 1):
-                    for y in range(cy - r, cy + r + 1, 1):
+                for x in range(cx - radius, cx + radius + 1, 1):
+                    for y in range(cy - radius, cy + radius + 1, 1):
                         if x < 0 or x >= barricade.rect.w or y < 0 or y >= barricade.rect.h:
                             continue
-                        barricade.mask.set_at((x, y), 0)
+                        if math.sqrt((x - cx) ** 2 + (y - cy) ** 2) > radius:
+                            continue
+
+                        if x == cx and y == cy:
+                            barricade.mask.set_at((x, y), 0)
+                        elif random.random() < BARRICADE_DESTRUCTION_PROBABILITY:
+                            barricade.mask.set_at((x, y), 0)
 
                 surf_array = pygame.surfarray.array3d(barricade.sprite)
                 for y in range(barricade.rect.h):
