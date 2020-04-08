@@ -43,18 +43,23 @@ class Missile:
 
 class Spaceship:
 
-    def __init__(
-            self,
-            rect: pygame.Rect,
-            sprite: pygame.Surface,
-            missile_explosion_sprite: pygame.Surface,
-            destruction_sprite: pygame.Surface,
-            shoot_sound: pygame.mixer.Sound,
-            destroy_sound: pygame.mixer.Sound,
+    def __init__(self):
+        missile_explosion_sprite = pygame.image.load(SPRITE_PATH + MISSILE_EXPLOSION_SPRITE_NAME)
+        sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME)
+        destruction_sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_DESTRUCTION_SPRITE_NAME)
+        w, h = sprite.get_rect().w, sprite.get_rect().h
+        spaceship_rect = pygame.Rect(
+            0,
+            0,
+            w,
+            h,
+        )
+        spaceship_rect.center = SPACESHIP_STARTING_POSITION
 
-    ):
+        shoot_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_SHOOT_SOUND)
+        destruction_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_DESTRUCTION_SOUND)
 
-        self.rect = rect
+        self.rect = spaceship_rect
         self.moving_direction = MovingDirection.IDLE
         self.move_amount = 0
 
@@ -67,10 +72,46 @@ class Spaceship:
 
         self.delay_since_explosion = 0
 
-        self.destroy_sound = destroy_sound
+        self.destroy_sound = destruction_sound
         self.shoot_sound = shoot_sound
 
         self.is_destroyed = False
+        self.is_active = True
+
+    def reset(self):
+        missile_explosion_sprite = pygame.image.load(SPRITE_PATH + MISSILE_EXPLOSION_SPRITE_NAME)
+        sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME)
+        destruction_sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_DESTRUCTION_SPRITE_NAME)
+        w, h = sprite.get_rect().w, sprite.get_rect().h
+        spaceship_rect = pygame.Rect(
+            0,
+            0,
+            w,
+            h,
+        )
+        spaceship_rect.center = SPACESHIP_STARTING_POSITION
+
+        shoot_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_SHOOT_SOUND)
+        destruction_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_DESTRUCTION_SOUND)
+
+        self.rect = spaceship_rect
+        self.moving_direction = MovingDirection.IDLE
+        self.move_amount = 0
+
+        self.firing = False
+        self.missile = None
+
+        self.sprite = sprite
+        self.missile_explosion_sprite = missile_explosion_sprite
+        self.destruction_sprite = destruction_sprite
+
+        self.delay_since_explosion = 0
+
+        self.destroy_sound = destruction_sound
+        self.shoot_sound = shoot_sound
+
+        self.is_destroyed = False
+        self.is_active = True
 
     def update(self, dt, events):
 
@@ -93,8 +134,13 @@ class Spaceship:
             self._fire()
         else:
             self.delay_since_explosion += dt
+            if self.is_destroyed and self.delay_since_explosion > SPACESHIP_EXPLOSION_DURATION_MS:
+                self.is_active = False
 
     def draw(self, surf: pygame.Surface):
+
+        if not self.is_active:
+            return
 
         if not self.is_destroyed:
             surf.blit(self.sprite, self.rect)
@@ -164,25 +210,3 @@ class Spaceship:
     def destroy(self):
         self.is_destroyed = True
         self.destroy_sound.play()
-
-
-class SpaceshipGenerator:
-
-    @staticmethod
-    def generate():
-        missile_explosion_sprite = pygame.image.load(SPRITE_PATH + MISSILE_EXPLOSION_SPRITE_NAME)
-        sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME)
-        destruction_sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_DESTRUCTION_SPRITE_NAME)
-        w, h = sprite.get_rect().w, sprite.get_rect().h
-        spaceship_rect = pygame.Rect(
-            0,
-            0,
-            w,
-            h,
-        )
-        spaceship_rect.center = SPACESHIP_STARTING_POSITION
-
-        shoot_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_SHOOT_SOUND)
-        destruction_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_DESTRUCTION_SOUND)
-        return Spaceship(spaceship_rect, sprite, missile_explosion_sprite, destruction_sprite, shoot_sound,
-                         destruction_sound)

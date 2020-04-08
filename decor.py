@@ -23,14 +23,24 @@ class Barricade:
     def draw(self, surf: pygame.Surface):
         surf.blit(self.sprite, self.rect)
 
-    @staticmethod
-    def generate_barricades():
-        barricades = []
+
+class Barricades:
+
+    def __init__(self):
+        self.barricade_list = []
 
         for b_pos in BARRICADE_POSITIONS:
             surf = pygame.image.load(SPRITE_PATH + BARRICADE_SPRITE_NAME)
             rect = surf.get_rect()
             rect.center = b_pos
-            barricades.append(Barricade(rect, surf))
+            self.barricade_list.append(Barricade(rect, surf))
 
-        return barricades
+    def draw(self, surf: pygame.Surface):
+        for b in self.barricade_list:
+            b.draw(surf)
+
+    def __iter__(self):
+        return self.barricade_list.__iter__()
+
+    def __next__(self):
+        return next(self.__iter__())

@@ -4,111 +4,112 @@ import sys
 
 import pygame
 
-from alien import AlienGenerator
+from alien import Aliens
 from config import *
-from decor import Ground, Barricade
-from spaceship import SpaceshipGenerator
+from controllers import LifeCounterController
+from decor import Ground, Barricades
+from spaceship import Spaceship
 from ui import Score, LifeCounter, HighScore
 
 
 class PySpaceInvaders:
 
     def __init__(self):
-        pygame.init()
+
+        # On crée la surface dans laquelle les sprites vont être affichés
         self.window_surface = pygame.display.set_mode(WINDOW_SIZE)
 
-        self.spaceship = SpaceshipGenerator.generate()
-        self.aliens = AlienGenerator.generate()
-        self.ground = Ground()
-        self.barricades = Barricade.generate_barricades()
-
-        digit_sprites = [pygame.image.load(SPRITE_PATH + str(i) + ".png") for i in range(0, 10)]
-        score_sprite = pygame.image.load(SPRITE_PATH + "score.png")
-        high_score_sprite = pygame.image.load(SPRITE_PATH + "high_score.png")
-        self.score = Score(digit_sprites, score_sprite)
-        self.high_score = HighScore(digit_sprites, high_score_sprite)
-        self.life_counter = LifeCounter(STARTING_LIFE_COUNT, pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME),
-                                        digit_sprites)
-
+        # Variables pour la game loop
         self.update_time_delay = 0
         self.draw_time_delay = 0
 
-    def play(self):
+        # On crée les entités du jeu
+        self.spaceship = Spaceship()
+        self.aliens = Aliens()
+        self.ground = Ground()
+        self.barricades = Barricades()
+        self.score = Score()
+        self.high_score = HighScore()
+        self.life_counter = LifeCounter()
 
+        # On crée les controllers
+        self.life_counter_controller = LifeCounterController(self.spaceship, self.life_counter)
+
+    def play(self):
         clock = pygame.time.Clock()
         while True:
             dt = clock.tick()
 
-            self.update(dt)
-            self.draw(dt)
+            update_count = self.get_update_count(dt)
+            if update_count > 0:
+                self.update(update_count * UPDATE_PERIOD_MS)
+
+            frame_count = self.get_frame_count(dt)
+            if frame_count > 0:
+                self.draw()
+
+    def update(self, dt):
+
+        # On récupère les événements dont les inputs
+        events = self.get_events()
+
+        # On met à jour les entités
+        self.spaceship.update(dt, events)
+        self.aliens.update(dt)
+
+        # On gère les interactions entre entités
+        self.life_counter_controller.control()
+        self.collide()
+
+    def get_update_count(self, dt):
+        # on incrémente le délai depuis la dernière update
+        self.update_time_delay += dt
+
+        # On compte combien on devrait avoir d'update. Si plus d'une, on affiche un warning.
+        update_count = self.update_time_delay // UPDATE_PERIOD_MS
+        if update_count > 1:
+            print(str(update_count - 1) + " updates are late.")
+
+        self.update_time_delay = self.update_time_delay % UPDATE_PERIOD_MS
+
+        return update_count
 
     def get_events(self):
         events = []
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
-
             events.append(event)
         return events
 
-    def update(self, dt):
-        self.update_time_delay += dt
+    def draw(self):
 
-        if self.update_time_delay < UPDATE_PERIOD_MS:
-            return
-
-        update_count = self.update_time_delay // UPDATE_PERIOD_MS
-        if update_count > 1:
-            print("Skipping " + str(update_count - 1) + " updates")
-
-        events = self.get_events()
-
-        if self.spaceship:
-            self.spaceship.update(update_count * UPDATE_PERIOD_MS, events)
-            if self.spaceship.is_destroyed and self.spaceship.delay_since_explosion > SPACESHIP_EXPLOSION_DURATION_MS:
-                self.spaceship = None
-
-        else:
-
-            if self.life_counter.life_count > 0:
-                self.life_counter.life_count -= 1
-                self.spaceship = SpaceshipGenerator.generate()
-
-        if not self.aliens.aliens:
-            self.aliens.move_sounds[self.aliens.acceleration_step].stop()
-            self.aliens = AlienGenerator.generate()
-        self.aliens.update(update_count * UPDATE_PERIOD_MS)
-
-        self.collide()
-
-        self.update_time_delay = self.update_time_delay % UPDATE_PERIOD_MS
-
-    def draw(self, dt):
-        self.draw_time_delay += dt
-
-        if self.draw_time_delay < DRAW_PERIOD_MS:
-            return
-
-        frame_count = self.draw_time_delay // DRAW_PERIOD_MS
-        if frame_count > 1:
-            print("Skipping " + str(frame_count - 1) + " frames")
-
+        # d'abord on efface tout ce qui est à l'écran
         self.window_surface.fill((0, 0, 0,))
 
+        # On dessine toutes les entités
         self.ground.draw(self.window_surface)
-        for barricade in self.barricades:
-            barricade.draw(self.window_surface)
-
-        if self.spaceship:  self.spaceship.draw(self.window_surface)
+        self.barricades.draw(self.window_surface)
+        self.spaceship.draw(self.window_surface)
         self.aliens.draw(self.window_surface)
-
         self.score.draw(self.window_surface)
         self.high_score.draw(self.window_surface)
         self.life_counter.draw(self.window_surface)
 
+        # on affiche à l'écran
         pygame.display.flip()
 
+    def get_frame_count(self, dt):
+        # on incrémente le délai depuis la dernière frame
+        self.draw_time_delay += dt
+
+        # On compte combien on devrait avoir de frame. Si plus d'une, on affiche un warning.
+        frame_count = self.draw_time_delay // DRAW_PERIOD_MS
+        if frame_count > 1:
+            print("Skipping " + str(frame_count - 1) + " frames")
+
         self.draw_time_delay = self.draw_time_delay % DRAW_PERIOD_MS
+        return frame_count
 
     def collide(self):
         self._collide_missile_and_aliens()
@@ -226,7 +227,7 @@ class PySpaceInvaders:
 
         return False
 
-
 if __name__ == "__main__":
+    pygame.init()
     game = PySpaceInvaders()
     game.play()

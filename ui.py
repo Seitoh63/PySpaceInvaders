@@ -1,12 +1,15 @@
 import pygame
 
-import config
 from config import *
 
 
 class Score:
 
-    def __init__(self, digit_sprites: list, score_sprite: pygame.Surface):
+    def __init__(self):
+
+        digit_sprites = [pygame.image.load(SPRITE_PATH + str(i) + ".png") for i in range(0, 10)]
+        score_sprite = pygame.image.load(SPRITE_PATH + "score.png")
+
         self.score = 0
         self.digit_sprites = digit_sprites
         self.score_sprite = score_sprite
@@ -27,9 +30,13 @@ class Score:
             surf.blit(self.digit_sprites[int(digit)], r)
             x0 += r.w + step
 
+
 class HighScore:
 
-    def __init__(self, digit_sprites: list, high_score_sprite: pygame.Surface):
+    def __init__(self):
+        digit_sprites = [pygame.image.load(SPRITE_PATH + str(i) + ".png") for i in range(0, 10)]
+        high_score_sprite = pygame.image.load(SPRITE_PATH + "high_score.png")
+
         self.high_score = 0
         self.digit_sprites = digit_sprites
         self.high_score_sprite = high_score_sprite
@@ -50,22 +57,19 @@ class HighScore:
             surf.blit(self.digit_sprites[int(digit)], r)
             x0 += r.w + step
 
+
 class LifeCounter:
 
-    def __init__(self, life_count, life_sprite:pygame.Surface, digit_sprites : list):
-        self.life_count = life_count
-        self.life_sprite = life_sprite
-        self.digit_sprites = digit_sprites
+    def __init__(self):
+        self.life_count = STARTING_LIFE_COUNT
+        self.life_sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME)
+        self.digit_sprites = [pygame.image.load(SPRITE_PATH + str(i) + ".png") for i in range(0, 10)]
 
-    def draw(self, surf:pygame.Surface):
-
-        surf.blit(self.digit_sprites[self.life_count], pygame.Rect(LIFE_COUNT_POS,(0,0)))
+    def draw(self, surf: pygame.Surface):
+        surf.blit(self.digit_sprites[self.life_count], pygame.Rect(LIFE_COUNT_POS, (0, 0)))
 
         rect = self.life_sprite.get_rect()
         rect.topleft = LIFE_POS
         for life in range(self.life_count):
             surf.blit(self.life_sprite, rect)
-            rect.left,rect.top = (rect.left + LIFE_POS_SHIFT[0] + rect.w , rect.top + LIFE_POS_SHIFT[1])
-
-
-
+            rect.left, rect.top = (rect.left + LIFE_POS_SHIFT[0] + rect.w, rect.top + LIFE_POS_SHIFT[1])

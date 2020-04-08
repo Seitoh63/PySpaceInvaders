@@ -169,7 +169,38 @@ class Alien:
 
 class Aliens:
 
-    def __init__(self, aliens, move_sounds: list):
+    def __init__(self):
+        aliens = []
+
+        alien_sprites = [[pygame.image.load(SPRITE_PATH + s) for s in ss] for ss in ALIEN_SPRITE_NAMES]
+        explosion_sprite = pygame.image.load(SPRITE_PATH + ALIEN_EXPLOSION_SPRITE_NAME)
+        laser_explosion_sprite = pygame.image.load(SPRITE_PATH + LASER_EXPLOSION_SPRITE_NAME)
+
+        max_w = max([sprites[0].get_rect().w for sprites in alien_sprites])
+        max_row_size = max([len(row) for row in ALIEN_FORMATION])
+        step = ALIEN_FORMATION_WIDTH_PIXELS / max_row_size
+        x0 = (-max_w) // 2 + (WORLD_DIM[0] - ALIEN_FORMATION_WIDTH_PIXELS) // 2
+        xs = [x0 + (step * i) for i in range(max_row_size)]
+
+        destroy_sound = pygame.mixer.Sound(SOUND_PATH + ALIEN_DESTROYED_SOUND)
+        move_sounds = [pygame.mixer.Sound(SOUND_PATH + sound) for sound in ALIEN_MOVE_SOUNDS]
+        for row_index, alien_row in enumerate(ALIEN_FORMATION):
+            for i, alien_index in enumerate(alien_row):
+                sprites = alien_sprites[alien_index - 1]
+                w, h = (sprites[0].get_rect().w, sprites[0].get_rect().h)
+
+                center_x = xs[i]
+                center_y = h + (2 * h * row_index) + ALIEN_STARTING_POS_Y
+
+                alien_rect = pygame.Rect(
+                    center_x - w // 2,
+                    center_y - h // 2,
+                    w,
+                    h,
+                )
+
+                aliens.append(
+                    Alien(alien_index, alien_rect, sprites, explosion_sprite, laser_explosion_sprite, destroy_sound))
 
         self.aliens = aliens
         self.rect = None
@@ -197,7 +228,65 @@ class Aliens:
         return self.aliens.__iter__()
 
     def __next__(self):
-        return self.aliens.__next__()
+        return next(self.__iter__())
+
+    def reset(self):
+        self.move_sounds[self.acceleration_step].stop()
+        self.soucoup_sound.stop()
+
+        aliens = []
+
+        alien_sprites = [[pygame.image.load(SPRITE_PATH + s) for s in ss] for ss in ALIEN_SPRITE_NAMES]
+        explosion_sprite = pygame.image.load(SPRITE_PATH + ALIEN_EXPLOSION_SPRITE_NAME)
+        laser_explosion_sprite = pygame.image.load(SPRITE_PATH + LASER_EXPLOSION_SPRITE_NAME)
+
+        max_w = max([sprites[0].get_rect().w for sprites in alien_sprites])
+        max_row_size = max([len(row) for row in ALIEN_FORMATION])
+        step = ALIEN_FORMATION_WIDTH_PIXELS / max_row_size
+        x0 = (-max_w) // 2 + (WORLD_DIM[0] - ALIEN_FORMATION_WIDTH_PIXELS) // 2
+        xs = [x0 + (step * i) for i in range(max_row_size)]
+
+        destroy_sound = pygame.mixer.Sound(SOUND_PATH + ALIEN_DESTROYED_SOUND)
+        move_sounds = [pygame.mixer.Sound(SOUND_PATH + sound) for sound in ALIEN_MOVE_SOUNDS]
+        for row_index, alien_row in enumerate(ALIEN_FORMATION):
+            for i, alien_index in enumerate(alien_row):
+                sprites = alien_sprites[alien_index - 1]
+                w, h = (sprites[0].get_rect().w, sprites[0].get_rect().h)
+
+                center_x = xs[i]
+                center_y = h + (2 * h * row_index) + ALIEN_STARTING_POS_Y
+
+                alien_rect = pygame.Rect(
+                    center_x - w // 2,
+                    center_y - h // 2,
+                    w,
+                    h,
+                )
+
+                aliens.append(
+                    Alien(alien_index, alien_rect, sprites, explosion_sprite, laser_explosion_sprite, destroy_sound))
+
+        self.aliens = aliens
+        self.rect = None
+        self._update_rect()
+
+        self.last_firing_delay = 0
+        self.movement_direction = MovingDirection.RIGHT
+        self.last_movement_sequence_delay = 0
+        self.movement_speed = ALIEN_SPEED_PIXEL_PER_SECOND
+        self.move_amount = 0
+        self.move_sounds = move_sounds
+        self.sound_index = 0
+        self.move_sounds[0].play(loops=-1)
+
+        self.starting_alien_count = len(aliens)
+        self.acceleration_step = 0
+
+        self.lasers = []
+
+        self.soucoup = None
+        self.soucoup_sound = pygame.mixer.Sound(SOUND_PATH + SOUCOUP_SOUND)
+        self.last_soucoup_appearing_delay = 0
 
     def update(self, dt):
 
@@ -237,6 +326,9 @@ class Aliens:
             self.last_soucoup_appearing_delay -= SOUCOUP_POP_PERIOD_S * 1000
             self.soucoup = Soucoup.generate()
             self.soucoup_sound.play(loops=-1)
+
+        if not self.aliens:
+            self.reset()
 
     def draw(self, surf):
         for alien in self:
@@ -327,44 +419,3 @@ class Aliens:
         x1 = max(alien.rect.right for alien in self.aliens)
         y1 = max(alien.rect.bottom for alien in self.aliens)
         self.rect = pygame.Rect(x0, y0, x1 - x0, y1 - y0)
-
-class AlienGenerator:
-
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def generate():
-        aliens = []
-
-        alien_sprites = [[pygame.image.load(SPRITE_PATH + s) for s in ss] for ss in ALIEN_SPRITE_NAMES]
-        explosion_sprite = pygame.image.load(SPRITE_PATH + ALIEN_EXPLOSION_SPRITE_NAME)
-        laser_explosion_sprite = pygame.image.load(SPRITE_PATH + LASER_EXPLOSION_SPRITE_NAME)
-
-        max_w = max([sprites[0].get_rect().w for sprites in alien_sprites])
-        max_row_size = max([len(row) for row in ALIEN_FORMATION])
-        step = ALIEN_FORMATION_WIDTH_PIXELS / max_row_size
-        x0 = (-max_w) // 2 + (WORLD_DIM[0] - ALIEN_FORMATION_WIDTH_PIXELS) // 2
-        xs = [x0 + (step * i) for i in range(max_row_size)]
-
-        destroy_sound = pygame.mixer.Sound(SOUND_PATH + ALIEN_DESTROYED_SOUND)
-        move_sounds = [ pygame.mixer.Sound(SOUND_PATH + sound) for sound in ALIEN_MOVE_SOUNDS]
-        for row_index, alien_row in enumerate(ALIEN_FORMATION):
-            for i, alien_index in enumerate(alien_row):
-                sprites = alien_sprites[alien_index - 1]
-                w, h = (sprites[0].get_rect().w, sprites[0].get_rect().h)
-
-                center_x = xs[i]
-                center_y = h + (2 * h * row_index) + ALIEN_STARTING_POS_Y
-
-                alien_rect = pygame.Rect(
-                    center_x - w // 2,
-                    center_y - h // 2,
-                    w,
-                    h,
-                )
-
-                aliens.append(
-                    Alien(alien_index, alien_rect, sprites, explosion_sprite, laser_explosion_sprite, destroy_sound))
-
-        return Aliens(aliens, move_sounds)
