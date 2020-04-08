@@ -6,7 +6,6 @@ import pygame
 
 from alien import Aliens
 from config import *
-from controllers import LifeCounterController
 from decor import Ground, Barricades
 from spaceship import Spaceship
 from ui import Score, LifeCounter, HighScore
@@ -16,14 +15,14 @@ class PySpaceInvaders:
 
     def __init__(self):
 
-        # On crée la surface dans laquelle les sprites vont être affichés
+        # We create a surface in which sprites will be shown
         self.window_surface = pygame.display.set_mode(WINDOW_SIZE)
 
-        # Variables pour la game loop
+        # Variables for game loop
         self.update_time_delay = 0
         self.draw_time_delay = 0
 
-        # On crée les entités du jeu
+        # We create the game entities
         self.spaceship = Spaceship()
         self.aliens = Aliens()
         self.ground = Ground()
@@ -32,40 +31,44 @@ class PySpaceInvaders:
         self.high_score = HighScore()
         self.life_counter = LifeCounter()
 
-        # On crée les controllers
-        self.life_counter_controller = LifeCounterController(self.spaceship, self.life_counter)
-
     def play(self):
         clock = pygame.time.Clock()
         while True:
             dt = clock.tick()
 
-            update_count = self.get_update_count(dt)
+            update_count = self._get_update_count(dt)
             if update_count > 0:
-                self.update(update_count * UPDATE_PERIOD_MS)
+                # This update the entities from the game
+                self._update(update_count * UPDATE_PERIOD_MS)
 
-            frame_count = self.get_frame_count(dt)
+                # Here, it's all the update that involves several entities, like collision
+                self._update_life_count()
+                self._collide()
+
+            frame_count = self._get_frame_count(dt)
             if frame_count > 0:
-                self.draw()
+                self._draw()
 
-    def update(self, dt):
+    def _update(self, dt):
 
-        # On récupère les événements dont les inputs
-        events = self.get_events()
+        # Getting input events
+        events = self._get_events()
 
-        # On met à jour les entités
+        # Updating each entity
         self.spaceship.update(dt, events)
         self.aliens.update(dt)
 
-        # On gère les interactions entre entités
-        self.life_counter_controller.control()
-        self.collide()
+    def _update_life_count(self):
+        if not self.spaceship.is_active:
+            if self.life_counter.life_count > 0:
+                self.life_counter.life_count -= 1
+                self.spaceship.reset()
 
-    def get_update_count(self, dt):
-        # on incrémente le délai depuis la dernière update
+    def _get_update_count(self, dt):
+        # Incrementing the delay since previous update
         self.update_time_delay += dt
 
-        # On compte combien on devrait avoir d'update. Si plus d'une, on affiche un warning.
+        # Count how many updates should be done. If more than one, a warning is shown
         update_count = self.update_time_delay // UPDATE_PERIOD_MS
         if update_count > 1:
             print(str(update_count - 1) + " updates are late.")
@@ -74,7 +77,7 @@ class PySpaceInvaders:
 
         return update_count
 
-    def get_events(self):
+    def _get_events(self):
         events = []
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -82,12 +85,12 @@ class PySpaceInvaders:
             events.append(event)
         return events
 
-    def draw(self):
+    def _draw(self):
 
-        # d'abord on efface tout ce qui est à l'écran
+        # First we clear everything from screen
         self.window_surface.fill((0, 0, 0,))
 
-        # On dessine toutes les entités
+        # We draw each entity
         self.ground.draw(self.window_surface)
         self.barricades.draw(self.window_surface)
         self.spaceship.draw(self.window_surface)
@@ -96,14 +99,14 @@ class PySpaceInvaders:
         self.high_score.draw(self.window_surface)
         self.life_counter.draw(self.window_surface)
 
-        # on affiche à l'écran
+        # We show the screen
         pygame.display.flip()
 
-    def get_frame_count(self, dt):
-        # on incrémente le délai depuis la dernière frame
+    def _get_frame_count(self, dt):
+        # Incrementing delay since previous frame
         self.draw_time_delay += dt
 
-        # On compte combien on devrait avoir de frame. Si plus d'une, on affiche un warning.
+        # We count how many frames we should draw. If more than one, we show a warning.
         frame_count = self.draw_time_delay // DRAW_PERIOD_MS
         if frame_count > 1:
             print("Skipping " + str(frame_count - 1) + " frames")
@@ -111,7 +114,7 @@ class PySpaceInvaders:
         self.draw_time_delay = self.draw_time_delay % DRAW_PERIOD_MS
         return frame_count
 
-    def collide(self):
+    def _collide(self):
         self._collide_missile_and_aliens()
         self._collide_spaceship_and_aliens()
         self._collide_spaceship_and_lasers()
@@ -119,33 +122,52 @@ class PySpaceInvaders:
         self._collide_missile_and_barricades()
         self._collide_laser_and_barricades()
         self._collide_alien_and_barricades()
-        self._collide_missile_and_soucoup()
+        self._collide_missile_and_saucer()
 
     def _collide_missile_and_aliens(self):
-        if self.spaceship is None or self.spaceship.missile is None:
+
+        # If no missile, no collision to check
+        if self.spaceship.missile is None:
             return
+
+        # Get rectangle from missile
         missile_rect = self.spaceship.missile.rect
+
+        # Get each alien rectangle and check collision
         for alien in self.aliens:
             if missile_rect.colliderect(alien.rect):
+                # if collision, make the alien explode and remove missile
                 alien.explode()
-                self.score.score += alien.type * 10
                 self.spaceship.missile = None
 
-    def _collide_missile_and_soucoup(self):
-        if self.spaceship is None or self.spaceship.missile is None or self.aliens.soucoup is None:
+                # increase score
+                self.score.value += alien.type * 10
+
+    def _collide_missile_and_saucer(self):
+
+        # If no missile or no saucer
+        if self.spaceship.missile is None or self.aliens.saucer is None:
             return
 
+        # Get rectangle from missile and saucer
         missile_rect = self.spaceship.missile.rect
-        soucoup_rect = self.aliens.soucoup.rect
-        if missile_rect.colliderect(soucoup_rect):
-            self.aliens.soucoup.explode()
+        saucer_rect = self.aliens.saucer.rect
+
+        # if collision, make the saucer explode and remove missile
+        if missile_rect.colliderect(saucer_rect):
+            self.aliens.saucer.explode()
             self.spaceship.missile = None
-            self.score.score += 300
+
+            # increase score
+            self.score.value += 300
 
     def _collide_spaceship_and_aliens(self):
+
+        # Get each alien rect and check collision with spaceship
         for alien in self.aliens:
 
-            if self.spaceship is None:
+            # If spaceship already destroyed, we stop.
+            if self.spaceship.is_destroyed:
                 return
 
             if alien.rect.colliderect(self.spaceship.rect):
@@ -153,21 +175,28 @@ class PySpaceInvaders:
 
     def _collide_spaceship_and_lasers(self):
 
-        if self.spaceship is None:
+        # If spaceship already destroyed, we return
+        if self.spaceship.is_destroyed is None:
             return
 
+        # Get each laser rectangle and spaceship rectangle
         laser_rect_list = [laser.rect for laser in self.aliens.lasers]
         spaceship_rect = self.spaceship.rect
+
         if spaceship_rect.collidelist(laser_rect_list) != - 1:
             self.spaceship.destroy()
 
     def _collide_missile_and_lasers(self):
 
-        if self.spaceship is None or self.spaceship.missile is None:
+        # If no missile, no collision to check
+        if self.spaceship.missile is None:
             return
 
+        # Get each laser rectangle and missile rectangle
         laser_rect_list = [laser.rect for laser in self.aliens.lasers]
         missile_rect = self.spaceship.missile.rect
+
+        # If collision, we remove both
         laser_index = missile_rect.collidelist(laser_rect_list)
         if laser_index != -1:
             self.spaceship.missile = None
@@ -175,57 +204,84 @@ class PySpaceInvaders:
 
     def _collide_missile_and_barricades(self):
 
-        if self.spaceship is None or self.spaceship.missile is None:
+        # If no missile, no collision to check
+        if self.spaceship.missile is None:
             return
 
+        # If collision, update barricade sprite and destroy missile
         if self._collide_with_barricades(self.spaceship.missile, MISSILE_BARRICADE_EXPLOSION_RADIUS):
             self.spaceship.missile = None
 
     def _collide_laser_and_barricades(self):
 
+        # If collision, update barricade sprite and destroy laser
         for laser in self.aliens.lasers:
             if self._collide_with_barricades(laser, LASER_BARRICADE_EXPLOSION_RADIUS):
                 self.aliens.lasers.remove(laser)
 
     def _collide_alien_and_barricades(self):
 
+        # If collision, update barricade sprite only, alien continue to live
         for alien in self.aliens:
             self._collide_with_barricades(alien, LASER_BARRICADE_EXPLOSION_RADIUS)
 
     def _collide_with_barricades(self, shoot, radius):
 
+        # build colliding entity mask
         w, h = (shoot.rect.w, shoot.rect.h)
         x, y = (shoot.rect.x, shoot.rect.y)
         shoot_mask = pygame.Mask((w, h), fill=True)
 
         for barricade in self.barricades:
+
+            # get distance vector between top left of barricade and colliding entity
             offset = (x - barricade.rect.x, y - barricade.rect.y)
+
+            # Find a colliding pixel
             collision_point = barricade.mask.overlap(shoot_mask, offset)
 
             if collision_point:
-                cx, cy = collision_point
-                for x in range(cx - radius, cx + radius + 1, 1):
-                    for y in range(cy - radius, cy + radius + 1, 1):
-                        if x < 0 or x >= barricade.rect.w or y < 0 or y >= barricade.rect.h:
-                            continue
-                        if math.sqrt((x - cx) ** 2 + (y - cy) ** 2) > radius:
-                            continue
-
-                        if x == cx and y == cy:
-                            barricade.mask.set_at((x, y), 0)
-                        elif random.random() < BARRICADE_DESTRUCTION_PROBABILITY:
-                            barricade.mask.set_at((x, y), 0)
-
-                surf_array = pygame.surfarray.array3d(barricade.sprite)
-                for y in range(barricade.rect.h):
-                    for x in range(barricade.rect.w):
-                        if barricade.mask.get_at((x, y)) == 0:
-                            surf_array[x, y] = (0, 0, 0)
-                barricade.sprite = pygame.surfarray.make_surface(surf_array)
+                self._apply_explosion_on_mask(collision_point, radius, barricade)
+                self._build_sprite_from_mask(barricade)
 
                 return True
 
         return False
+
+    def _apply_explosion_on_mask(self, collision_point, radius, barricade):
+
+        # At collision point, remove pixels
+        cx, cy = collision_point
+        barricade.mask.set_at((cx, cy), 0)
+
+        # Loop on each pixel around collision point
+        for x in range(cx - radius, cx + radius + 1, 1):
+            for y in range(cy - radius, cy + radius + 1, 1):
+
+                # If not in barricade sprite, continue
+                if x < 0 or x >= barricade.rect.w or y < 0 or y >= barricade.rect.h:
+                    continue
+
+                # if not in the circle around collision, continue
+                if math.sqrt((x - cx) ** 2 + (y - cy) ** 2) > radius:
+                    continue
+
+                # We remove the pixel under a given probability
+                if random.random() < BARRICADE_DESTRUCTION_PROBABILITY:
+                    barricade.mask.set_at((x, y), 0)
+
+    def _build_sprite_from_mask(self, barricade):
+
+        # create an surfarray and change pixel color according to mask
+        surf_array = pygame.surfarray.array3d(barricade.sprite)
+        for y in range(barricade.rect.h):
+            for x in range(barricade.rect.w):
+                if barricade.mask.get_at((x, y)) == 0:
+                    surf_array[x, y] = (0, 0, 0)
+
+        # make sprite from surfarray.
+        barricade.sprite = pygame.surfarray.make_surface(surf_array)
+
 
 if __name__ == "__main__":
     pygame.init()

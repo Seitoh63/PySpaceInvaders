@@ -10,12 +10,12 @@ class Score:
         digit_sprites = [pygame.image.load(SPRITE_PATH + str(i) + ".png") for i in range(0, 10)]
         score_sprite = pygame.image.load(SPRITE_PATH + "score.png")
 
-        self.score = 0
+        self.value = 0
         self.digit_sprites = digit_sprites
         self.score_sprite = score_sprite
 
     def draw(self, surf: pygame.Surface):
-        score_str = str(self.score)
+        score_str = str(self.value)
         while len(score_str) < SCORE_DIGIT_COUNT:
             score_str = '0' + score_str
 

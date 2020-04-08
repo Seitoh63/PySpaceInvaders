@@ -44,6 +44,7 @@ class Missile:
 class Spaceship:
 
     def __init__(self):
+
         missile_explosion_sprite = pygame.image.load(SPRITE_PATH + MISSILE_EXPLOSION_SPRITE_NAME)
         sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME)
         destruction_sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_DESTRUCTION_SPRITE_NAME)

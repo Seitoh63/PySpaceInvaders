@@ -6,7 +6,7 @@ from config import *
 from tools import MovingDirection
 
 
-class Soucoup:
+class Saucer:
 
     def __init__(self, rect: pygame.Rect, sprite, explosion_sprite, direction: MovingDirection):
         self.rect = rect
@@ -27,7 +27,7 @@ class Soucoup:
     def _move(self, dt):
         if self.is_exploded:
             return
-        self.move_amount += dt / 1000 * SOUCOUP_SPEED_PIXEL_PER_SECOND
+        self.move_amount += dt / 1000 * SAUCER_SPEED_PIXEL_PER_SECOND
         if self.move_amount > 1.:
             self.rect.x += int(self.move_amount) * self.moving_direction.value[0][0]
             self.move_amount -= int(self.move_amount)
@@ -43,17 +43,17 @@ class Soucoup:
 
     @staticmethod
     def generate():
-        sprite = pygame.image.load(SPRITE_PATH + SOUCOUP_SPRITE_NAME)
+        sprite = pygame.image.load(SPRITE_PATH + SAUCER_SPRITE_NAME)
         explosion_sprite = pygame.image.load(SPRITE_PATH + ALIEN_EXPLOSION_SPRITE_NAME)
         rect = sprite.get_rect()
-        rect.top = SOUCOUP_STARTING_POS_Y
+        rect.top = SAUCER_STARTING_POS_Y
 
         xs = [0, WORLD_DIM[0] - rect.w]
         dirs = [MovingDirection.RIGHT, MovingDirection.LEFT]
         index = random.choice([0, 1])
         rect.left = xs[index]
         direction = dirs[index]
-        return Soucoup(rect, sprite, explosion_sprite, direction)
+        return Saucer(rect, sprite, explosion_sprite, direction)
 
 
 class Laser:
@@ -220,9 +220,9 @@ class Aliens:
 
         self.lasers = []
 
-        self.soucoup = None
-        self.soucoup_sound = pygame.mixer.Sound(SOUND_PATH + SOUCOUP_SOUND)
-        self.last_soucoup_appearing_delay = 0
+        self.saucer = None
+        self.saucer_sound = pygame.mixer.Sound(SOUND_PATH + SAUCER_SOUND)
+        self.last_saucer_appearing_delay = 0
 
     def __iter__(self):
         return self.aliens.__iter__()
@@ -232,7 +232,7 @@ class Aliens:
 
     def reset(self):
         self.move_sounds[self.acceleration_step].stop()
-        self.soucoup_sound.stop()
+        self.saucer_sound.stop()
 
         aliens = []
 
@@ -284,9 +284,9 @@ class Aliens:
 
         self.lasers = []
 
-        self.soucoup = None
-        self.soucoup_sound = pygame.mixer.Sound(SOUND_PATH + SOUCOUP_SOUND)
-        self.last_soucoup_appearing_delay = 0
+        self.saucer = None
+        self.saucer_sound = pygame.mixer.Sound(SOUND_PATH + SAUCER_SOUND)
+        self.last_saucer_appearing_delay = 0
 
     def update(self, dt):
 
@@ -310,22 +310,22 @@ class Aliens:
         self._update_aliens(dt, move)
         self._update_lasers(dt)
 
-        if self.soucoup:
-            self.soucoup.update(dt)
+        if self.saucer:
+            self.saucer.update(dt)
 
-            if self.soucoup.rect.x > WORLD_DIM[0] or self.soucoup.rect.right < 0:
-                self.soucoup = None
-                self.soucoup_sound.stop()
+            if self.saucer.rect.x > WORLD_DIM[0] or self.saucer.rect.right < 0:
+                self.saucer = None
+                self.saucer_sound.stop()
 
-        if self.soucoup and self.soucoup.is_exploded and self.soucoup.time_since_explosion > EXPLOSION_DURATION_MS:
-            self.soucoup = None
-            self.soucoup_sound.stop()
+        if self.saucer and self.saucer.is_exploded and self.saucer.time_since_explosion > EXPLOSION_DURATION_MS:
+            self.saucer = None
+            self.saucer_sound.stop()
 
-        self.last_soucoup_appearing_delay += dt
-        if self.last_soucoup_appearing_delay > SOUCOUP_POP_PERIOD_S * 1000:
-            self.last_soucoup_appearing_delay -= SOUCOUP_POP_PERIOD_S * 1000
-            self.soucoup = Soucoup.generate()
-            self.soucoup_sound.play(loops=-1)
+        self.last_saucer_appearing_delay += dt
+        if self.last_saucer_appearing_delay > SAUCER_POP_PERIOD_S * 1000:
+            self.last_saucer_appearing_delay -= SAUCER_POP_PERIOD_S * 1000
+            self.saucer = Saucer.generate()
+            self.saucer_sound.play(loops=-1)
 
         if not self.aliens:
             self.reset()
@@ -336,8 +336,8 @@ class Aliens:
         for laser in self.lasers:
             laser.draw(surf)
 
-        if self.soucoup:
-            self.soucoup.draw(surf)
+        if self.saucer:
+            self.saucer.draw(surf)
 
     def remove(self, alien):
         self.aliens.remove(alien)
