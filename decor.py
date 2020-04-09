@@ -14,26 +14,19 @@ class Ground:
 
 class Barricade:
 
-    def __init__(self, rect: pygame.Rect, barricade_sprite: pygame.Surface):
-        self.sprite = barricade_sprite
-        self.rect = rect
+    def __init__(self, center):
+        self.sprite = pygame.image.load(SPRITE_PATH + BARRICADE_SPRITE_NAME)
+        self.rect = self.sprite.get_rect(center=center)
         self.mask = pygame.mask.from_threshold(self.sprite, (0, 0, 0, 0), (1, 1, 1, 255))
         self.mask.invert()
 
     def draw(self, surf: pygame.Surface):
         surf.blit(self.sprite, self.rect)
 
-
 class Barricades:
 
     def __init__(self):
-        self.barricade_list = []
-
-        for b_pos in BARRICADE_POSITIONS:
-            surf = pygame.image.load(SPRITE_PATH + BARRICADE_SPRITE_NAME)
-            rect = surf.get_rect()
-            rect.center = b_pos
-            self.barricade_list.append(Barricade(rect, surf))
+        self.barricade_list = [Barricade(b_pos) for b_pos in BARRICADE_POSITIONS]
 
     def draw(self, surf: pygame.Surface):
         for b in self.barricade_list:

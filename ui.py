@@ -6,13 +6,9 @@ from config import *
 class Score:
 
     def __init__(self):
-
-        digit_sprites = [pygame.image.load(SPRITE_PATH + str(i) + ".png") for i in range(0, 10)]
-        score_sprite = pygame.image.load(SPRITE_PATH + "score.png")
-
         self.value = 0
-        self.digit_sprites = digit_sprites
-        self.score_sprite = score_sprite
+        self.digit_sprites = [pygame.image.load(SPRITE_PATH + str(i) + ".png") for i in range(0, 10)]
+        self.score_sprite = pygame.image.load(SPRITE_PATH + "score.png")
 
     def draw(self, surf: pygame.Surface):
         score_str = str(self.value)

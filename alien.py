@@ -105,23 +105,23 @@ class Laser:
 
 class Alien:
 
-    def __init__(
-            self,
-            type: int,
-            top_left_pos,
-    ):
-        self.type = type
+    def __init__(self, type: int, top_left_pos):
 
+        # Type of alien, defining its sprite
+        self.type = type
         self.sprites = [pygame.image.load(SPRITE_PATH + s) for s in ALIEN_SPRITE_NAMES[type - 1]]
+        self.explosion_sprite = pygame.image.load(SPRITE_PATH + ALIEN_EXPLOSION_SPRITE_NAME)
+
         self.sprite_index = 0
         self.last_sprite_shift_delay = 0
         self.shift_sprite_period = ALIEN_SPRITE_SHIFT_PERIOD_MS
+
         self.rect = self.sprites[self.sprite_index].get_rect(topleft=top_left_pos)
+
         self.move_amount = 0
 
         self.delay_since_explosion = 0
         self.is_exploded = False
-        self.explosion_sprite = pygame.image.load(SPRITE_PATH + ALIEN_EXPLOSION_SPRITE_NAME)
 
         self.destroy_sound = pygame.mixer.Sound(SOUND_PATH + ALIEN_DESTROYED_SOUND)
 
@@ -210,7 +210,27 @@ class Aliens:
         return next(self.__iter__())
 
     def reset(self):
-        pass
+        # We stop every sound
+        for sound in self.move_sounds:
+            sound.stop()
+
+        self.aliens = self._init_aliens()
+        self.rect = self._get_rect()
+        self.lasers = []
+
+        self.movement_direction = MovingDirection.RIGHT
+        self.last_movement_sequence_delay = 0
+        self.move_amount = 0
+        self.movement_speed = ALIEN_SPEED_PIXEL_PER_SECOND
+
+        self.sound_index = 0
+        self.move_sounds[0].play(loops=-1)
+
+        self.last_firing_delay = 0
+
+        self.last_saucer_appearing_delay = 0
+
+        self.acceleration_step = 0
 
     def update(self, dt):
 
@@ -282,7 +302,7 @@ class Aliens:
             return
 
         # Each time the total number of aliens is divided by 2, we accelerate
-        if len(self.aliens) < self.starting_alien_count // (2 ** (self.acceleration_step + 1)):
+        if len(self.aliens) <= self.starting_alien_count // (2 ** (self.acceleration_step + 1)):
             self.acceleration_step += 1
             self.movement_speed *= 2
             self.move_sounds[self.acceleration_step - 1].stop()
@@ -298,6 +318,10 @@ class Aliens:
                 self._remove_alien(alien)
 
     def _update_alien(self, dt):
+
+        if not self.aliens:
+            return
+
         movement = self._get_alien_movement(dt)
         for alien in self:
             alien.update(dt, movement)
@@ -383,6 +407,10 @@ class Aliens:
             self.saucer.set_inactive()
 
     def _get_rect(self):
+
+        if not self.aliens:
+            return pygame.Rect((0, 0), (0, 0))
+
         x0 = min(alien.rect.left for alien in self.aliens)
         y0 = min(alien.rect.top for alien in self.aliens)
         x1 = max(alien.rect.right for alien in self.aliens)
