@@ -127,7 +127,7 @@ class PySpaceInvaders:
     def _collide_missile_and_aliens(self):
 
         # If no missile, no collision to check
-        if self.spaceship.missile is None:
+        if not self.spaceship.missile.is_active:
             return
 
         # Get rectangle from missile
@@ -138,7 +138,7 @@ class PySpaceInvaders:
             if missile_rect.colliderect(alien.rect):
                 # if collision, make the alien explode and remove missile
                 alien.explode()
-                self.spaceship.missile = None
+                self.spaceship.missile.is_active = False
 
                 # increase score
                 self.score.value += alien.type * 10
@@ -146,7 +146,7 @@ class PySpaceInvaders:
     def _collide_missile_and_saucer(self):
 
         # If no missile or no saucer
-        if self.spaceship.missile is None or self.aliens.saucer is None:
+        if not self.spaceship.missile.is_active or self.aliens.saucer is None:
             return
 
         # Get rectangle from missile and saucer
@@ -156,7 +156,7 @@ class PySpaceInvaders:
         # if collision, make the saucer explode and remove missile
         if missile_rect.colliderect(saucer_rect):
             self.aliens.saucer.explode()
-            self.spaceship.missile = None
+            self.spaceship.missile.is_active = False
 
             # increase score
             self.score.value += 300
@@ -176,7 +176,7 @@ class PySpaceInvaders:
     def _collide_spaceship_and_lasers(self):
 
         # If spaceship already destroyed, we return
-        if self.spaceship.is_destroyed is None:
+        if self.spaceship.is_destroyed:
             return
 
         # Get each laser rectangle and spaceship rectangle
@@ -189,7 +189,7 @@ class PySpaceInvaders:
     def _collide_missile_and_lasers(self):
 
         # If no missile, no collision to check
-        if self.spaceship.missile is None:
+        if not self.spaceship.missile.is_active:
             return
 
         # Get each laser rectangle and missile rectangle
@@ -199,18 +199,18 @@ class PySpaceInvaders:
         # If collision, we remove both
         laser_index = missile_rect.collidelist(laser_rect_list)
         if laser_index != -1:
-            self.spaceship.missile = None
+            self.spaceship.missile.is_active = False
             self.aliens.lasers.pop(laser_index)
 
     def _collide_missile_and_barricades(self):
 
         # If no missile, no collision to check
-        if self.spaceship.missile is None:
+        if not self.spaceship.missile.is_active:
             return
 
         # If collision, update barricade sprite and destroy missile
         if self._collide_with_barricades(self.spaceship.missile, MISSILE_BARRICADE_EXPLOSION_RADIUS):
-            self.spaceship.missile = None
+            self.spaceship.missile.is_active = False
 
     def _collide_laser_and_barricades(self):
 
@@ -226,20 +226,12 @@ class PySpaceInvaders:
             self._collide_with_barricades(alien, LASER_BARRICADE_EXPLOSION_RADIUS)
 
     def _collide_with_barricades(self, shoot, radius):
-
-        # build colliding entity mask
-        w, h = (shoot.rect.w, shoot.rect.h)
-        x, y = (shoot.rect.x, shoot.rect.y)
-        shoot_mask = pygame.Mask((w, h), fill=True)
-
         for barricade in self.barricades:
 
-            # get distance vector between top left of barricade and colliding entity
-            offset = (x - barricade.rect.x, y - barricade.rect.y)
-
             # Find a colliding pixel
-            collision_point = barricade.mask.overlap(shoot_mask, offset)
+            collision_point = self._find_colliding_pixel(shoot, barricade)
 
+            # Handle collision if there is one
             if collision_point:
                 self._apply_explosion_on_mask(collision_point, radius, barricade)
                 self._build_sprite_from_mask(barricade)
@@ -247,6 +239,17 @@ class PySpaceInvaders:
                 return True
 
         return False
+
+    def _find_colliding_pixel(self, shoot, barricade):
+
+        # get distance vector between top left of barricade and colliding entity
+        x, y = (shoot.rect.x, shoot.rect.y)
+        offset = (x - barricade.rect.x, y - barricade.rect.y)
+
+        # Using mask to get collision point
+        w, h = (shoot.rect.w, shoot.rect.h)
+        shoot_mask = pygame.Mask((w, h), fill=True)
+        return barricade.mask.overlap(shoot_mask, offset)
 
     def _apply_explosion_on_mask(self, collision_point, radius, barricade):
 

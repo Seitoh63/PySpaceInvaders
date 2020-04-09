@@ -5,16 +5,30 @@ from tools import MovingDirection
 
 
 class Missile:
-    def __init__(self, rect: pygame.Rect, explosion_sprite):
+    def __init__(self):
+        self.rect = None
+
+        self.moving_direction = MovingDirection.UP
+        self.move_amount = 0
+
+        self.time_since_explosion = 0
+        self.explosion_sprite = pygame.image.load(SPRITE_PATH + MISSILE_EXPLOSION_SPRITE_NAME)
+        self.is_exploded = False
+        self.is_active = False
+
+    def launch(self, rect):
         self.rect = rect
         self.moving_direction = MovingDirection.UP
         self.move_amount = 0
 
         self.is_exploded = False
         self.time_since_explosion = 0
-        self.explosion_sprite = explosion_sprite
+        self.is_active = True
 
     def update(self, dt):
+
+        if not self.is_active:
+            return
 
         if self.is_exploded:
             self.time_since_explosion += dt
@@ -22,18 +36,31 @@ class Missile:
             self._move(dt)
 
     def _move(self, dt):
+
+        # If no moving direction, stay idle
         if self.moving_direction == MovingDirection.IDLE:
             return
 
-        self.move_amount += dt / 1000 * MISSILE_SPEED_PIXEL_PER_SECOND
+        # Else, compute how many pixel to move
+        dt_s = dt / 1000
+        self.move_amount += dt_s * MISSILE_SPEED_PIXEL_PER_SECOND
+
+        # If more than one, we move the sprite
         if self.move_amount > 1.:
             direction = -1 if self.moving_direction == MovingDirection.UP else 1
             self.rect.y += int(self.move_amount) * direction
             self.move_amount -= int(self.move_amount)
 
     def draw(self, surf: pygame.Surface):
+
+        if not self.is_active:
+            return
+
+        # If exploded, we show the explosion sprite
         if self.is_exploded:
             surf.blit(self.explosion_sprite, self.rect)
+
+        # Else, we draw the missile
         else:
             pygame.draw.rect(surf, MISSILE_RECT_COLOR, self.rect)
 
@@ -45,94 +72,47 @@ class Spaceship:
 
     def __init__(self):
 
-        missile_explosion_sprite = pygame.image.load(SPRITE_PATH + MISSILE_EXPLOSION_SPRITE_NAME)
-        sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME)
-        destruction_sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_DESTRUCTION_SPRITE_NAME)
-        w, h = sprite.get_rect().w, sprite.get_rect().h
-        spaceship_rect = pygame.Rect(
-            0,
-            0,
-            w,
-            h,
-        )
-        spaceship_rect.center = SPACESHIP_STARTING_POSITION
+        self.sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME)
+        self.rect = self.sprite.get_rect(center=SPACESHIP_STARTING_POSITION)
+        self.destruction_sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_DESTRUCTION_SPRITE_NAME)
 
-        shoot_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_SHOOT_SOUND)
-        destruction_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_DESTRUCTION_SOUND)
+        self.shoot_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_SHOOT_SOUND)
+        self.destruction_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_DESTRUCTION_SOUND)
 
-        self.rect = spaceship_rect
         self.moving_direction = MovingDirection.IDLE
         self.move_amount = 0
 
-        self.firing = False
-        self.missile = None
-
-        self.sprite = sprite
-        self.missile_explosion_sprite = missile_explosion_sprite
-        self.destruction_sprite = destruction_sprite
-
-        self.delay_since_explosion = 0
-
-        self.destroy_sound = destruction_sound
-        self.shoot_sound = shoot_sound
+        self.is_firing = False
+        self.missile = Missile()
 
         self.is_destroyed = False
+        self.delay_since_explosion = 0
         self.is_active = True
 
     def reset(self):
-        missile_explosion_sprite = pygame.image.load(SPRITE_PATH + MISSILE_EXPLOSION_SPRITE_NAME)
-        sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME)
-        destruction_sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_DESTRUCTION_SPRITE_NAME)
-        w, h = sprite.get_rect().w, sprite.get_rect().h
-        spaceship_rect = pygame.Rect(
-            0,
-            0,
-            w,
-            h,
-        )
-        spaceship_rect.center = SPACESHIP_STARTING_POSITION
+        self.shoot_sound.stop()
+        self.destruction_sound.stop()
 
-        shoot_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_SHOOT_SOUND)
-        destruction_sound = pygame.mixer.Sound(SOUND_PATH + SPACESHIP_DESTRUCTION_SOUND)
-
-        self.rect = spaceship_rect
         self.moving_direction = MovingDirection.IDLE
         self.move_amount = 0
 
-        self.firing = False
-        self.missile = None
-
-        self.sprite = sprite
-        self.missile_explosion_sprite = missile_explosion_sprite
-        self.destruction_sprite = destruction_sprite
-
-        self.delay_since_explosion = 0
-
-        self.destroy_sound = destruction_sound
-        self.shoot_sound = shoot_sound
+        self.is_firing = False
 
         self.is_destroyed = False
+        self.delay_since_explosion = 0
         self.is_active = True
 
     def update(self, dt, events):
 
-        for event in events:
-            self._handle_event(event)
+        # First, we check the user input
+        self._handle_events(events)
 
+        # If spaceship is not destroyed
         if not self.is_destroyed:
             self._move(dt)
-
-            if self.missile is not None:
-                self.missile.update(dt)
-
-                if self.missile.rect.top < 0:
-                    self.missile.rect.top = 0
-                    self.missile.explode()
-
-                if self.missile.time_since_explosion > EXPLOSION_DURATION_MS:
-                    self.missile = None
-
+            self._update_missile(dt)
             self._fire()
+
         else:
             self.delay_since_explosion += dt
             if self.is_destroyed and self.delay_since_explosion > SPACESHIP_EXPLOSION_DURATION_MS:
@@ -140,74 +120,100 @@ class Spaceship:
 
     def draw(self, surf: pygame.Surface):
 
-        if not self.is_active:
-            return
+        if self.is_active:
+            if self.is_destroyed:
+                self.destruction_sprite = pygame.transform.flip(self.destruction_sprite, True, False)
+                surf.blit(self.destruction_sprite, self.rect)
 
-        if not self.is_destroyed:
-            surf.blit(self.sprite, self.rect)
+            else:
+                surf.blit(self.sprite, self.rect)
 
-        else:
-            self.destruction_sprite = pygame.transform.flip(self.destruction_sprite, True, False)
-            surf.blit(self.destruction_sprite, self.rect)
-
-        if self.missile is not None:
+        if self.missile.is_active:
             self.missile.draw(surf)
 
-    def _handle_event(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                self.moving_direction = MovingDirection.LEFT
+    def _handle_events(self, events):
 
-            if event.key == pygame.K_RIGHT:
-                self.moving_direction = MovingDirection.RIGHT
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    self.moving_direction = MovingDirection.LEFT
 
-            if event.key == pygame.K_SPACE:
-                self.firing = True
+                if event.key == pygame.K_RIGHT:
+                    self.moving_direction = MovingDirection.RIGHT
 
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT and self.moving_direction == MovingDirection.LEFT:
-                self.moving_direction = MovingDirection.IDLE
+                if event.key == pygame.K_SPACE:
+                    self.is_firing = True
 
-            if event.key == pygame.K_RIGHT and self.moving_direction == MovingDirection.RIGHT:
-                self.moving_direction = MovingDirection.IDLE
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT and self.moving_direction == MovingDirection.LEFT:
+                    self.moving_direction = MovingDirection.IDLE
 
-            if event.key == pygame.K_SPACE:
-                self.firing = False
+                if event.key == pygame.K_RIGHT and self.moving_direction == MovingDirection.RIGHT:
+                    self.moving_direction = MovingDirection.IDLE
+
+                if event.key == pygame.K_SPACE:
+                    self.is_firing = False
 
     def _move(self, dt):
+
+        # If no moving direction, stay idle
         if self.moving_direction == MovingDirection.IDLE:
             return
 
-        self.move_amount += dt / 1000 * SPACESHIP_SPEED_PIXEL_PER_SECOND
+        # Else, check how many pixel to move
+        dt_s = dt / 1000
+        self.move_amount += dt_s * SPACESHIP_SPEED_PIXEL_PER_SECOND
         if self.move_amount > 1.:
 
+            # move in the given direction
             direction = -1 if self.moving_direction == MovingDirection.LEFT else 1
             self.rect.x += int(self.move_amount) * direction
             self.move_amount -= int(self.move_amount)
 
-            if self.rect.left < 0: self.rect.x = 0
-            if self.rect.right >= WORLD_DIM[0]: self.rect.right = WORLD_DIM[0] - 1
+            # check if out of world rect
+            if self.rect.left < 0:
+                self.rect.x = 0
+            if self.rect.right >= WORLD_DIM[0]:
+                self.rect.right = WORLD_DIM[0] - 1
+
+    def _update_missile(self, dt):
+        if not self.missile.is_active:
+            return
+
+        self.missile.update(dt)
+
+        # check if out of world rect
+        if self.missile.rect.top < 0:
+            self.missile.rect.top = 0
+            self.missile.explode()
+
+        # If missile is destroyed and explosion is over, remove missile
+        if self.missile.time_since_explosion > EXPLOSION_DURATION_MS:
+            self.missile.is_active = False
 
     def _fire(self):
 
-        if not self.firing:
+        # If spaceship is not firing, return
+        if not self.is_firing:
             return
 
-        ### Firing only when there is no actual missile, only one missile at a time
-        if self.missile is not None:
+        # Firing only when there is no actual missile, only one missile at a time
+        if self.missile.is_active:
             return
 
+        # launch missile and play the sound
+        self._launch_missile()
+        self.shoot_sound.play()
+
+    def destroy(self):
+        self.is_destroyed = True
+        self.destruction_sound.play()
+
+    def _launch_missile(self):
         missile_rect = pygame.Rect(
             self.rect.centerx - (MISSILE_RECT_DIM[0] // 2),
             self.rect.top - MISSILE_RECT_DIM[1],
             MISSILE_RECT_DIM[0],
             MISSILE_RECT_DIM[1]
         )
-
-        self.missile = Missile(missile_rect, self.missile_explosion_sprite)
-
-        self.shoot_sound.play()
-
-    def destroy(self):
-        self.is_destroyed = True
-        self.destroy_sound.play()
+        self.missile.launch(missile_rect)
