@@ -67,6 +67,8 @@ class Missile:
     def explode(self):
         self.is_exploded = True
 
+    def set_inactive(self):
+        self.is_active = False
 
 class Spaceship:
 
@@ -93,6 +95,8 @@ class Spaceship:
         self.shoot_sound.stop()
         self.destruction_sound.stop()
 
+        self.rect = self.sprite.get_rect(center=SPACESHIP_STARTING_POSITION)
+        
         self.moving_direction = MovingDirection.IDLE
         self.move_amount = 0
 
@@ -189,7 +193,7 @@ class Spaceship:
 
         # If missile is destroyed and explosion is over, remove missile
         if self.missile.time_since_explosion > EXPLOSION_DURATION_MS:
-            self.missile.is_active = False
+            self.missile.set_inactive()
 
     def _fire(self):
 

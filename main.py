@@ -146,7 +146,7 @@ class PySpaceInvaders:
     def _collide_missile_and_saucer(self):
 
         # If no missile or no saucer
-        if not self.spaceship.missile.is_active or self.aliens.saucer is None:
+        if not self.spaceship.missile.is_active or not self.aliens.saucer.is_active:
             return
 
         # Get rectangle from missile and saucer
