@@ -89,7 +89,8 @@ class Laser:
 
     def draw(self, surf: pygame.Surface):
         if self.is_exploded:
-            surf.blit(self.explosion_sprite, self.rect)
+            surf.blit(self.explosion_sprite, self.explosion_sprite.get_rect(center=self.rect.center))
+
         else:
             pygame.draw.rect(surf, LASER_RECT_COLOR, self.rect)
             pygame.draw.rect(
@@ -164,7 +165,7 @@ class Aliens:
 
     def __init__(self):
 
-        self.aliens = self._init_aliens()
+        self.alien_list = self._init_alien_list()
         self.rect = self._get_rect()
         self.lasers = []
         self.saucer = Saucer()
@@ -182,10 +183,13 @@ class Aliens:
 
         self.last_saucer_appearing_delay = 0
 
-        self.starting_alien_count = len(self.aliens)
+        self.starting_alien_count = len(self.alien_list)
         self.acceleration_step = 0
 
-    def _init_aliens(self):
+    def _init_alien_list(self):
+
+        # Quite cryptic function but it does the job
+        # TODO : improve readability
         aliens = []
         alien_sprites = [[pygame.image.load(SPRITE_PATH + s) for s in ss] for ss in ALIEN_SPRITE_NAMES]
         max_w = max([sprites[0].get_rect().w for sprites in alien_sprites])
@@ -204,7 +208,7 @@ class Aliens:
         return aliens
 
     def __iter__(self):
-        return self.aliens.__iter__()
+        return self.alien_list.__iter__()
 
     def __next__(self):
         return next(self.__iter__())
@@ -214,7 +218,7 @@ class Aliens:
         for sound in self.move_sounds:
             sound.stop()
 
-        self.aliens = self._init_aliens()
+        self.alien_list = self._init_alien_list()
         self.rect = self._get_rect()
         self.lasers = []
 
@@ -245,7 +249,7 @@ class Aliens:
         self._update_saucer(dt)
 
         # If no more aliens, we reset them
-        if not self.aliens:
+        if not self.alien_list:
             self.reset()
 
     def _update_aliens(self, dt):
@@ -277,9 +281,9 @@ class Aliens:
     def _firing_aliens(self):
 
         # Group the alien by columns in a dict
-        xs = set(alien.rect.centerx for alien in self.aliens)
+        xs = set(alien.rect.centerx for alien in self.alien_list)
         alien_dict = {x: [] for x in xs}
-        for alien in self.aliens:
+        for alien in self.alien_list:
             alien_dict[alien.rect.centerx].append(alien)
 
         # identify lowest alien on each column
@@ -302,14 +306,14 @@ class Aliens:
             return
 
         # Each time the total number of aliens is divided by 2, we accelerate
-        if len(self.aliens) <= self.starting_alien_count // (2 ** (self.acceleration_step + 1)):
+        if len(self.alien_list) <= self.starting_alien_count // (2 ** (self.acceleration_step + 1)):
             self.acceleration_step += 1
             self.movement_speed *= 2
             self.move_sounds[self.acceleration_step - 1].stop()
             self.move_sounds[self.acceleration_step].play(loops=-1)
 
             # We accelerate the sprite shift period of alien
-            for alien in self.aliens:
+            for alien in self.alien_list:
                 alien.shift_sprite_period = alien.shift_sprite_period // 2
 
     def _remove_aliens(self):
@@ -319,7 +323,7 @@ class Aliens:
 
     def _update_alien(self, dt):
 
-        if not self.aliens:
+        if not self.alien_list:
             return
 
         movement = self._get_alien_movement(dt)
@@ -348,12 +352,12 @@ class Aliens:
 
         # If too far right, we drop one line and go left
         if self.movement_direction == MovingDirection.RIGHT and self.rect.right >= WORLD_DIM[0]:
-            movement = (movement[0] - (self.rect.right - WORLD_DIM[0]), movement[1] + self.aliens[0].rect.h)
+            movement = (movement[0] - (self.rect.right - WORLD_DIM[0]), movement[1] + self.alien_list[0].rect.h)
             self.movement_direction = MovingDirection.LEFT
 
         # If too far left, we drop one line and go right
         if self.movement_direction == MovingDirection.LEFT and self.rect.left <= 0:
-            movement = (movement[0] - self.rect.left, movement[1] + self.aliens[0].rect.h)
+            movement = (movement[0] - self.rect.left, movement[1] + self.alien_list[0].rect.h)
             self.movement_direction = MovingDirection.RIGHT
 
         return movement
@@ -366,7 +370,7 @@ class Aliens:
         self.saucer.draw(surf)
 
     def _remove_alien(self, alien):
-        self.aliens.remove(alien)
+        self.alien_list.remove(alien)
 
     def _update_lasers(self, dt):
         for laser in self.lasers:
@@ -374,9 +378,7 @@ class Aliens:
             laser.update(dt)
 
             # If laser  out of screen, we explode it
-            if laser.rect.top > WORLD_DIM[1]:
-                laser.rect.left -= laser.explosion_sprite.get_rect().w // 2
-                laser.rect.top = WORLD_DIM[1] - laser.explosion_sprite.get_rect().h
+            if laser.rect.bottom >= WORLD_DIM[1]:
                 laser.explode()
 
             # If laser is destroyed for too long, we remove it from the list
@@ -408,13 +410,13 @@ class Aliens:
 
     def _get_rect(self):
 
-        if not self.aliens:
+        if not self.alien_list:
             return pygame.Rect((0, 0), (0, 0))
 
-        x0 = min(alien.rect.left for alien in self.aliens)
-        y0 = min(alien.rect.top for alien in self.aliens)
-        x1 = max(alien.rect.right for alien in self.aliens)
-        y1 = max(alien.rect.bottom for alien in self.aliens)
+        x0 = min(alien.rect.left for alien in self.alien_list)
+        y0 = min(alien.rect.top for alien in self.alien_list)
+        x1 = max(alien.rect.right for alien in self.alien_list)
+        y1 = max(alien.rect.bottom for alien in self.alien_list)
         rect = pygame.Rect(x0, y0, x1 - x0, y1 - y0)
         return rect
 

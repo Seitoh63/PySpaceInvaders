@@ -16,7 +16,7 @@ ALIEN_SPRITE_NAMES = [
 ALIEN_EXPLOSION_SPRITE_NAME = "alien_explosion.png"
 MISSILE_EXPLOSION_SPRITE_NAME = "missile_explosion.png"
 LASER_EXPLOSION_SPRITE_NAME = "laser_explosion.png"
-SPACESHIP_DESTRUCTION_SPRITE_NAME = "laser_explosion.png"
+SPACESHIP_DESTRUCTION_SPRITE_NAME = "spaceship_explosion.png"
 BARRICADE_SPRITE_NAME = "barricade.png"
 SAUCER_SPRITE_NAME = "saucer.png"
 

@@ -58,7 +58,7 @@ class Missile:
 
         # If exploded, we show the explosion sprite
         if self.is_exploded:
-            surf.blit(self.explosion_sprite, self.rect)
+            surf.blit(self.explosion_sprite, self.explosion_sprite.get_rect(center=self.rect.center))
 
         # Else, we draw the missile
         else:
