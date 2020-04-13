@@ -23,7 +23,7 @@ The spaceship (aka the player) can move on the horizontal axis, avoiding laser s
 The spaceship can also fire at aliens, but it should aim properly since it's only one shot at a time.
 It can take cover below barriers, but they are gradually destroyed by enemy lasers and spaceship missiles.
 
-Hit aliens are destroyed and award points. Periodicaly, a mistery saucer will appears, granting a lot of bonus point if destroyed.
+Hit aliens are destroyed and award points. Periodicaly, a mistery saucer will appear, granting a lot of bonus point if destroyed.
 
 ## How to play
 
