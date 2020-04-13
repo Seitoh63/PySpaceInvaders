@@ -11,7 +11,7 @@ The goal, as for most of the arcade game of this time, is to obtain the highest 
 
 Here a screenshot from my implementation :
 
-  <img src="https://i.imgur.com/IpdLZet.gifv" />
+  <img src="https://i.imgur.com/IpdLZet.gif" />
 
 ## Gameplay 
 
