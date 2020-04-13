@@ -325,7 +325,7 @@ class Aliens:
 
     def _remove_aliens(self):
         for alien in self:
-            if alien.delay_since_explosion > EXPLOSION_DURATION_MS:
+            if alien.delay_since_explosion > ALIEN_EXPLOSION_DURATION_MS:
                 self._remove_alien(alien)
 
     def _update_alien(self, dt):
@@ -389,7 +389,7 @@ class Aliens:
                 laser.explode()
 
             # If laser is destroyed for too long, we remove it from the list
-            if laser.is_exploded and laser.time_since_explosion > EXPLOSION_DURATION_MS:
+            if laser.is_exploded and laser.time_since_explosion > ALIEN_EXPLOSION_DURATION_MS:
                 self.lasers.remove(laser)
                 continue
 

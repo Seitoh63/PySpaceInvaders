@@ -33,12 +33,12 @@ class HighScore:
         digit_sprites = [pygame.image.load(SPRITE_PATH + str(i) + ".png") for i in range(0, 10)]
         high_score_sprite = pygame.image.load(SPRITE_PATH + "high_score.png")
 
-        self.high_score = 0
+        self.value = 0
         self.digit_sprites = digit_sprites
         self.high_score_sprite = high_score_sprite
 
     def draw(self, surf: pygame.Surface):
-        score_str = str(self.high_score)
+        score_str = str(self.value)
         while len(score_str) < SCORE_DIGIT_COUNT:
             score_str = '0' + score_str
 
@@ -76,3 +76,14 @@ class LifeCounter:
         self.life_count += 1
         self.life_gain_count += 1
         self.one_life_up_sound.play()
+
+
+class GameOver:
+
+    def __init__(self):
+        self.game_over_sprite = pygame.image.load(SPRITE_PATH + "game_over.png")
+
+    def draw(self, surf: pygame.Surface):
+        w, h = WORLD_DIM
+        center = (w // 2, h // 2)
+        surf.blit(self.game_over_sprite, self.game_over_sprite.get_rect(center=center))

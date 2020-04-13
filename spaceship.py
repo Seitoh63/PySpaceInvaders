@@ -192,7 +192,7 @@ class Spaceship:
             self.missile.explode()
 
         # If missile is destroyed and explosion is over, remove missile
-        if self.missile.time_since_explosion > EXPLOSION_DURATION_MS:
+        if self.missile.time_since_explosion > ALIEN_EXPLOSION_DURATION_MS:
             self.missile.set_inactive()
 
     def _fire(self):

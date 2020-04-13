@@ -8,7 +8,7 @@ from alien import Aliens
 from config import *
 from decor import Ground, Barricades
 from spaceship import Spaceship
-from ui import Score, LifeCounter, HighScore
+from ui import Score, LifeCounter, HighScore, GameOver
 
 
 class PySpaceInvaders:
@@ -22,6 +22,11 @@ class PySpaceInvaders:
         self.update_time_delay = 0
         self.draw_time_delay = 0
 
+        # Game state variable
+        self.is_game_over = False
+        self.delay_since_game_over = 0
+        self.is_playing = True
+
         # We create the game entities
         self.spaceship = Spaceship()
         self.aliens = Aliens()
@@ -30,6 +35,7 @@ class PySpaceInvaders:
         self.score = Score()
         self.high_score = HighScore()
         self.life_counter = LifeCounter()
+        self.game_over = GameOver()
 
     def play(self):
         clock = pygame.time.Clock()
@@ -38,6 +44,13 @@ class PySpaceInvaders:
 
             update_count = self._get_update_count(dt)
             if update_count > 0:
+
+                # If game over for too long, reset the game
+                if self.is_game_over:
+                    self.delay_since_game_over += update_count * UPDATE_PERIOD_MS
+                    if self.delay_since_game_over > GAME_OVER_DURATION_S * 1000:
+                        self._reset()
+
                 # This update the entities from the game
                 self._update(update_count * UPDATE_PERIOD_MS)
 
@@ -66,6 +79,8 @@ class PySpaceInvaders:
             if self.life_counter.life_count > 0:
                 self.life_counter.life_count -= 1
                 self.spaceship.reset()
+            else:
+                self._game_over()
 
     def _get_update_count(self, dt):
         # Incrementing the delay since previous update
@@ -101,6 +116,9 @@ class PySpaceInvaders:
         self.score.draw(self.window_surface)
         self.high_score.draw(self.window_surface)
         self.life_counter.draw(self.window_surface)
+
+        if self.is_game_over:
+            self.game_over.draw(self.window_surface)
 
         # We show the screen
         pygame.display.flip()
@@ -287,6 +305,24 @@ class PySpaceInvaders:
 
         # make sprite from surfarray.
         barricade.sprite = pygame.surfarray.make_surface(surf_array)
+
+    def _game_over(self):
+        self.is_game_over = True
+        self.is_playing = False
+        if self.score.value > self.high_score.value:
+            self.high_score.value = self.score.value
+
+    def _reset(self):
+
+        self.spaceship = Spaceship()
+        self.aliens.reset()
+        self.barricades = Barricades()
+        self.score = Score()
+        self.life_counter = LifeCounter()
+
+        self.is_game_over = False
+        self.delay_since_game_over = 0
+        self.is_playing = True
 
 
 if __name__ == "__main__":
