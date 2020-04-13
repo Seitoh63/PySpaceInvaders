@@ -69,17 +69,20 @@ class Saucer:
 
 class Laser:
 
-    def __init__(self, top_left_pos):
-
-        self.rect = pygame.Rect(top_left_pos, LASER_RECT_DIM)
+    def __init__(self, top_left_pos, type_index: int):
 
         self.moving_direction = MovingDirection.DOWN
         self.move_amount = 0
 
+        self.sprites = [pygame.image.load(SPRITE_PATH + s) for s in LASER_SPRITE_NAMES[type_index]]
+        self.sprite_index = 0
+
+        self.rect = pygame.Rect(top_left_pos, self.sprites[self.sprite_index].get_rect().size)
+
         self.is_exploded = False
         self.time_since_explosion = 0
         self.explosion_sprite = pygame.image.load(SPRITE_PATH + LASER_EXPLOSION_SPRITE_NAME)
-        self.h_bar_y = 0
+
 
     def update(self, dt):
         if self.is_exploded:
@@ -99,13 +102,9 @@ class Laser:
             surf.blit(self.explosion_sprite, self.explosion_sprite.get_rect(center=self.rect.center))
 
         else:
-            pygame.draw.rect(surf, LASER_RECT_COLOR, self.rect)
-            pygame.draw.rect(
-                surf,
-                LASER_RECT_COLOR,
-                pygame.Rect((self.rect.left - 3, self.rect.top + self.h_bar_y), LASER_H_BAR_DIM)
-            )
-            self.h_bar_y = (self.h_bar_y + LASER_H_BAR_MOVE_SPEED) % self.rect.h
+            sprite = self.sprites[self.sprite_index]
+            surf.blit(sprite, sprite.get_rect(center=self.rect.center))
+            self.sprite_index = (self.sprite_index + 1) % len(self.sprites)
 
     def explode(self):
         self.is_exploded = True
@@ -145,7 +144,10 @@ class Alien:
         self.rect.x += movement[0]
 
     def fire(self):
-        return Laser((self.rect.centerx - (LASER_RECT_DIM[0] // 2), self.rect.bottom))
+        return Laser(
+            (self.rect.centerx - (LASER_RECT_DIM[0] // 2), self.rect.bottom),
+            random.randint(0, len(LASER_SPRITE_NAMES) - 1)
+        )
 
     def draw(self, surf: pygame.Surface):
 

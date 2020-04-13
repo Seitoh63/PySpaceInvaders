@@ -15,6 +15,12 @@ ALIEN_SPRITE_NAMES = [
 ]
 ALIEN_EXPLOSION_SPRITE_NAME = "alien_explosion.png"
 MISSILE_EXPLOSION_SPRITE_NAME = "missile_explosion.png"
+SPACESHIP_SPRITE_NAME = "spaceship.png"
+LASER_SPRITE_NAMES = [
+    ["laser1_frame1.png", "laser1_frame2.png", "laser1_frame3.png", "laser1_frame4.png"],
+    ["laser2_frame1.png", "laser2_frame2.png", "laser2_frame3.png", "laser2_frame4.png"],
+    ["laser3_frame1.png", "laser3_frame2.png", "laser3_frame3.png", "laser3_frame4.png"]
+]
 LASER_EXPLOSION_SPRITE_NAME = "laser_explosion.png"
 SPACESHIP_DESTRUCTION_SPRITE_NAME = "spaceship_explosion.png"
 BARRICADE_SPRITE_NAME = "barricade.png"
@@ -43,7 +49,7 @@ ONE_LIFE_UP_SOUND = "one_life.wav"
 WORLD_DIM = (400, 600)
 
 ### LIFE_COUNT ###
-STARTING_LIFE_COUNT = 1
+STARTING_LIFE_COUNT = 3
 LIFE_COUNT_POS = (WORLD_DIM[0] // 20, WORLD_DIM[1] + 3)
 LIFE_POS = (WORLD_DIM[0] // 10, WORLD_DIM[1] + 3)
 LIFE_POS_SHIFT = (3, 0)
