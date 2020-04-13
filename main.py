@@ -210,7 +210,7 @@ class PySpaceInvaders:
 
         # If collision, update barricade sprite and destroy missile
         if self._collide_with_barricades(self.spaceship.missile, MISSILE_BARRICADE_EXPLOSION_RADIUS):
-            self.spaceship.missile.explode()
+            self.spaceship.missile.is_active = False
 
     def _collide_laser_and_barricades(self):
 

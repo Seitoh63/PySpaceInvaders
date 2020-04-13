@@ -11,7 +11,7 @@ class Saucer:
     def __init__(self):
 
         self.sprite = pygame.image.load(SPRITE_PATH + SAUCER_SPRITE_NAME)
-        self.explosion_sprite = pygame.image.load(SPRITE_PATH + ALIEN_EXPLOSION_SPRITE_NAME)
+        self.explosion_sprite = pygame.image.load(SPRITE_PATH + SAUCER_EXPLOSION_SPRITE_NAME)
 
         self.rect = self.sprite.get_rect()
         self.moving_direction = None
@@ -19,8 +19,10 @@ class Saucer:
 
         self.is_exploded = False
         self.time_since_explosion = 0
+        self.explosion_duration = SAUCER_EXPLOSION_DURATION_MS
 
         self.saucer_sound = pygame.mixer.Sound(SOUND_PATH + SAUCER_SOUND)
+        self.saucer_destruction_sound = pygame.mixer.Sound(SOUND_PATH + SAUCER_DESTRUCTION_SOUND)
         self.is_active = False
 
     def launch(self, top_left_pos, direction: MovingDirection):
@@ -28,6 +30,9 @@ class Saucer:
         self.moving_direction = direction
         self.saucer_sound.play(loops=-1)
         self.is_active = True
+
+        self.is_exploded = False
+        self.time_since_explosion = 0
 
     def update(self, dt):
         if self.is_exploded:
@@ -54,11 +59,13 @@ class Saucer:
 
     def explode(self):
         self.is_exploded = True
+        self.saucer_sound.stop()
+        self.saucer_destruction_sound.play()
 
     def set_inactive(self):
         self.is_active = False
         self.saucer_sound.stop()
-
+        self.saucer_destruction_sound.stop()
 
 class Laser:
 
@@ -405,7 +412,7 @@ class Aliens:
             self.saucer.set_inactive()
 
         # If is exploded for too long, set it inactive
-        if self.saucer.is_exploded and self.saucer.time_since_explosion > EXPLOSION_DURATION_MS:
+        if self.saucer.is_exploded and self.saucer.time_since_explosion > self.saucer.explosion_duration:
             self.saucer.set_inactive()
 
     def _get_rect(self):
