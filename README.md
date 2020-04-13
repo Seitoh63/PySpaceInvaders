@@ -10,9 +10,11 @@ Space invaders is originally an arcade game released in 1978. It is a 2D shooter
 The goal, as for most of the arcade game of this time, is to obtain the highest score by destroying continuously the incoming aliens.
 
 Here a screenshot from my implementation :
-<p align="center">
-  <img src="http://imgur.com/w8xKxY2.png" />
+<p float="left">
+  <img src="https://i.imgur.com/WKrfXYW.gif" />
+  <img src="https://i.imgur.com/H9q8WB7.gif" />
 </p>
+
 
 ## Gameplay 
 
