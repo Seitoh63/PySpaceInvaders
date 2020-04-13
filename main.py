@@ -59,6 +59,9 @@ class PySpaceInvaders:
         self.aliens.update(dt)
 
     def _update_life_count(self):
+        if self.score.value // ONE_LIFE_SCORE > self.life_counter.life_gain_count:
+            self.life_counter.one_up()
+
         if not self.spaceship.is_active:
             if self.life_counter.life_count > 0:
                 self.life_counter.life_count -= 1

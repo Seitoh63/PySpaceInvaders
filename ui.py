@@ -57,9 +57,11 @@ class HighScore:
 class LifeCounter:
 
     def __init__(self):
+        self.life_gain_count = 0
         self.life_count = STARTING_LIFE_COUNT
         self.life_sprite = pygame.image.load(SPRITE_PATH + SPACESHIP_SPRITE_NAME)
         self.digit_sprites = [pygame.image.load(SPRITE_PATH + str(i) + ".png") for i in range(0, 10)]
+        self.one_life_up_sound = pygame.mixer.Sound(SOUND_PATH + ONE_LIFE_UP_SOUND)
 
     def draw(self, surf: pygame.Surface):
         surf.blit(self.digit_sprites[self.life_count], pygame.Rect(LIFE_COUNT_POS, (0, 0)))
@@ -69,3 +71,8 @@ class LifeCounter:
         for life in range(self.life_count):
             surf.blit(self.life_sprite, rect)
             rect.left, rect.top = (rect.left + LIFE_POS_SHIFT[0] + rect.w, rect.top + LIFE_POS_SHIFT[1])
+
+    def one_up(self):
+        self.life_count += 1
+        self.life_gain_count += 1
+        self.one_life_up_sound.play()

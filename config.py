@@ -37,6 +37,8 @@ SPACESHIP_DESTRUCTION_SOUND = "explosion.wav"
 SAUCER_SOUND = "saucer.wav"
 SAUCER_DESTRUCTION_SOUND = "saucer_destroyed.wav"
 
+ONE_LIFE_UP_SOUND = "one_life.wav"
+
 ### ENTITIES ###
 WORLD_DIM = (400, 600)
 
@@ -95,3 +97,5 @@ HIGH_SCORE_POS = (WORLD_DIM[0] // 10 * 5, WORLD_DIM[1] // 10)
 LIFE_COUNT_POS = (WORLD_DIM[0] // 20, WORLD_DIM[1] + 3)
 LIFE_POS = (WORLD_DIM[0] // 10, WORLD_DIM[1] + 3)
 LIFE_POS_SHIFT = (3, 0)
+
+ONE_LIFE_SCORE = 1500
