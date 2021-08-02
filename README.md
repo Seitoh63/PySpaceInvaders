@@ -62,7 +62,4 @@ There is a configuration file *config.py* which contains all the configuration d
 It can be modified to customize the game experience.
 
 
-## Contact
-
 I'm very glad you take some time to look at my game and at my code!
-You can contact me at :  sethogeekATgmail.com
