@@ -129,8 +129,8 @@ class PySpaceInvaders:
 
         # We count how many frames we should draw. If more than one, we show a warning.
         frame_count = self.draw_time_delay // DRAW_PERIOD_MS
-        if frame_count > 1:
-            print("Skipping " + str(frame_count - 1) + " frames")
+#        if frame_count > 1:
+#            print("Skipping " + str(frame_count - 1) + " frames")
 
         self.draw_time_delay = self.draw_time_delay % DRAW_PERIOD_MS
         return frame_count
