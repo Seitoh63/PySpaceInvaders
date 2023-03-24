@@ -88,8 +88,8 @@ class PySpaceInvaders:
 
         # Count how many updates should be done. If more than one, a warning is shown
         update_count = self.update_time_delay // UPDATE_PERIOD_MS
-        if update_count > 1:
-            print(str(update_count - 1) + " updates are late.")
+#        if update_count > 1:
+#            print(str(update_count - 1) + " updates are late.")
 
         self.update_time_delay = self.update_time_delay % UPDATE_PERIOD_MS
 
