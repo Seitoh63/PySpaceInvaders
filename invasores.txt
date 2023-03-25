@@ -1,3 +1,17 @@
 this text file will be a partial devlog
 2023 03 25
 added art drawn by Eric Garcia to replace original art
+  rename Crown, Church, Ship, Canon, Knight, Soldier, Pyramid to match names in original to minimize chance of breaking game.
+  resize Crown to match saucer dimensions 48px x 21px
+  resize Pyramid to match barricade dimensions 42px x 32px
+  resize BowArrow to match spaceship dimensions 26px x 16px
+
+To do:
+  add to alien class two more aliens, alien4 and alien5
+    config.py
+    alien.py
+  add to spaceship class a sprite for missile, if possible
+    config.py
+    spaceship.py, beginning at line 65
+  add events for a gamepad or joystick
+    spaceship.py, beginning at line 138
