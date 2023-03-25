@@ -1,0 +1,3 @@
+this text file will be a partial devlog
+2023 03 25
+added art drawn by Eric Garcia to replace original art
