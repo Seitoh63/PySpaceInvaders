@@ -11,7 +11,9 @@ SPACESHIP_SPRITE_NAME = "spaceship.png"
 ALIEN_SPRITE_NAMES = [
     ["alien1_frame1.png", "alien1_frame2.png"],
     ["alien2_frame1.png", "alien2_frame2.png"],
-    ["alien3_frame1.png", "alien3_frame2.png"]
+    ["alien3_frame1.png", "alien3_frame2.png"],
+    ["alien4_frame1.png", "alien4_frame2.png"],
+    ["alien5_frame1.png", "alien5_frame2.png"]
 ]
 ALIEN_EXPLOSION_SPRITE_NAME = "alien_explosion.png"
 MISSILE_EXPLOSION_SPRITE_NAME = "missile_explosion.png"
