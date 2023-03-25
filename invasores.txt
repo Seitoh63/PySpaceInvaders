@@ -15,3 +15,12 @@ To do:
     spaceship.py, beginning at line 65
   add events for a gamepad or joystick if possible
     spaceship.py, beginning at line 138
+
+from Eric:
+    Is it too much to set up a hierarchy?
+    Crown (saucer)
+    Church (alien5)
+    Ship  (alien4)
+    Canon (alien3)
+    Knight (alien2)
+    Soldier (alien1)
