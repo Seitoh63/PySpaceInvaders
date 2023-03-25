@@ -8,10 +8,10 @@ added art drawn by Eric Garcia to replace original art
 
 To do:
   add to alien class two more aliens, alien4 and alien5
-    config.py
-    alien.py
+    config.py, ALIEN_FORMATION and ALIEN_SPRITE_NAMES
+    alien.py, beginning line 198 with the creation of the list of aliens
   add to spaceship class a sprite for missile, if possible
     config.py
     spaceship.py, beginning at line 65
-  add events for a gamepad or joystick
+  add events for a gamepad or joystick if possible
     spaceship.py, beginning at line 138
