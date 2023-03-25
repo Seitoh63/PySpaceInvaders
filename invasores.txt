@@ -24,3 +24,8 @@ from Eric:
     Canon (alien3)
     Knight (alien2)
     Soldier (alien1)
+
+Done:
+add to alien class two more aliens, alien4 and alien5
+  config.py, ALIEN_FORMATION and ALIEN_SPRITE_NAMES
+  alien.py, beginning line 198 with the creation of the list of aliens
