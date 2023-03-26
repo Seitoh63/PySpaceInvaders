@@ -4,7 +4,7 @@ import sys
 
 import pygame
 
-from alien import Aliens
+from alien import Alie  ns
 from config import *
 from decor import Ground, Barricades
 from spaceship import Spaceship
@@ -16,7 +16,7 @@ class PySpaceInvaders:
     def __init__(self):
 
         # We create a surface in which sprites will be shown
-        self.window_surface = pygame.display.set_mode(WINDOW_SIZE)
+        self.window_surface = pygame.display.set_mode(WINDOW_SIZE, FULLSCREEN)
 
         # Variables for game loop
         self.update_time_delay = 0
