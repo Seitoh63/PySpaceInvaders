@@ -4,7 +4,7 @@ import sys
 
 import pygame
 
-from alien import Alie  ns
+from alien import Aliens
 from config import *
 from decor import Ground, Barricades
 from spaceship import Spaceship
