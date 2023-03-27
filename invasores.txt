@@ -1,4 +1,6 @@
 this text file will be a partial devlog
+
+
 2023 03 25
 added art drawn by Eric Garcia to replace original art
   rename Crown, Church, Ship, Canon, Knight, Soldier, Pyramid to match names in original to minimize chance of breaking game.
@@ -31,3 +33,7 @@ add to alien class two more aliens, alien4 and alien5
   alien.py, beginning line 198 with the creation of the list of aliens
 
 created a branch called fullscreen on GitHub that has correct syntax for FULLSCREEN in main.py line 19. This will require the creation of a KEYUP event to quit the game, or force an unplugging of the Raspberry Pi. I'm not integrating this branch to master yet.
+
+
+2023 03 27
+new unit test: created a branch on GitHub called scaled; added argument to main.py line 19 "pygame.SCALED"; tested on Raspberry Pi; did not work, we are using pygame v. 1.9 and the SCALED entity is introduced i pygame v.2
