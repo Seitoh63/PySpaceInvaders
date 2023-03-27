@@ -34,6 +34,13 @@ add to alien class two more aliens, alien4 and alien5
 
 created a branch called fullscreen on GitHub that has correct syntax for FULLSCREEN in main.py line 19. This will require the creation of a KEYUP event to quit the game, or force an unplugging of the Raspberry Pi. I'm not integrating this branch to master yet.
 
+2023 03 26
+downloaded a pygame script to test gamepads to Raspberry Pi. It was updated for pygame v.2 but appears backward compatible.
+
+Tested USB NES gamepad and it worked.
+Tested USB Trooper2 Atari style gamepad and it worked.
+this shows a pathway to adding gamepad events to code. I don't know how much time it will take.
+
 
 2023 03 27
 new unit test: created a branch on GitHub called scaled; added argument to main.py line 19 "pygame.SCALED"; tested on Raspberry Pi; did not work, we are using pygame v. 1.9 and the SCALED entity is introduced i pygame v.2
