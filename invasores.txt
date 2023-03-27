@@ -44,3 +44,6 @@ this shows a pathway to adding gamepad events to code. I don't know how much tim
 
 2023 03 27
 new unit test: created a branch on GitHub called scaled; added argument to main.py line 19 "pygame.SCALED"; tested on Raspberry Pi; did not work, we are using pygame v. 1.9 and the SCALED entity is introduced i pygame v.2
+
+verified version of python installed : 3.9.2
+verified version of pyinstaller installed : 5.9.0
