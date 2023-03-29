@@ -47,3 +47,9 @@ new unit test: created a branch on GitHub called scaled; added argument to main.
 
 verified version of python installed : 3.9.2
 verified version of pyinstaller installed : 5.9.0
+
+
+2023 03 29
+new unit test, no new branch yet. On a second Raspberry Pi I tried adding key events to the event handler in alien.py. I tested a sys.quit() and a toggle_fullscreen directive. Both worked, but not perfectly -- or, not as expected. Will have to try again.
+
+I also was able to launch the unedited PySpaceInvaders from within Geany on that Raspberry Pi. The OS and model is identical to the show machine.
