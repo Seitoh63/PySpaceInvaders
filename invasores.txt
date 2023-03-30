@@ -83,5 +83,7 @@ I added branch for RESIZABLE with toggle_fullscreen. This may be the branch to m
 
 I added code to enable quitting with the ESCAPE key.
 
+I've added a branch called joystick to begin exploring if joystick events can be added without breaking the code. No luck so far with my first attempt.
+
 ====
 end of file
