@@ -96,7 +96,7 @@ class Spaceship:
         self.destruction_sound.stop()
 
         self.rect = self.sprite.get_rect(center=SPACESHIP_STARTING_POSITION)
-        
+
         self.moving_direction = MovingDirection.IDLE
         self.move_amount = 0
 
@@ -147,6 +147,9 @@ class Spaceship:
 
                 if event.key == pygame.K_SPACE:
                     self.is_firing = True
+
+                if event.key == pygame.K_F12:
+                    pygame.display.toggle_fullscreen()
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT and self.moving_direction == MovingDirection.LEFT:
