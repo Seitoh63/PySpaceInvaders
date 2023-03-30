@@ -79,5 +79,9 @@ I'm curious to see if I can learn to make a joystick work.
 
 Today I learned that the Aztecs called the Spaniards COYOTL because they were tricksters who stole by night.
 
+I added branch for RESIZABLE with toggle_fullscreen. This may be the branch to merge with the main one (named master). (F12 key toggles)
+
+I added code to enable quitting with the ESCAPE key.
+
 ====
 end of file
