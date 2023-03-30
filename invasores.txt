@@ -66,6 +66,9 @@ Contents: Raspberry Pi 4B with 4GB RAM, Grey Aluminum passive cooled case, power
 
 I am providing a SanDisk Extreme Pro 32GB microSD card with Raspbery Pi OS installed. I've taken it from what has been the development machine to date. It contains a copy of the game.
 
+Vilros also offers a pre-assembled kit which includes a microSD:
+https://vilros.com/products/vilros-raspberry-pi-4-pre-assembled-complete-starter-kit?variant=39707014922334
+
 I've tested the RasPi 4 with the microSD and it works. This is necessary because this disk has a 32-bit version of the "Bullseye" OS.
 
 I've also tested it with another microSD card (same OS) that I used for yesterday's unit tests and it worked. The toggle_fullscreen worked as it should. It displayed the game, centered on the screen, fullscreen, when toggled on. Yesterday I only saw a black screen. I could toggle back and forth using the F12 key event that I had programmed into an unbranched copy of PySpaceInvaders.
