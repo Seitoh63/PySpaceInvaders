@@ -86,4 +86,18 @@ I added code to enable quitting with the ESCAPE key.
 I've added a branch called joystick to begin exploring if joystick events can be added without breaking the code. No luck so far with my first attempt.
 
 ====
+2023 04 04
+I took the weekend off for my birthday.
+Yesterday I had dinner with Eric who is in town to give a lecture.
+
+Today I merged the RESIZABLE branch into the master file.
+I also added KEYDOWN event for the ESCAPE key.
+I downloaded the new version and tested it.
+
+the fullscreen toggle doesn't work with the screen orientation rotated to right at any resolution. I have tested with 1080p, 720p, and 480x640.
+
+the fullscreen toggle works well and scales the game with normal orientation and resolutions up to 1080p. I cannot test a higher one.
+
+I will add ESCAPE key event to branch named fullscreen and test that branch.
+====
 end of file
