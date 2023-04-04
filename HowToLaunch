@@ -18,15 +18,14 @@ your options are
 		click "undo" in Screen Layout Editor to undo request for change
 		click "Apply" in Screen Layout Editor to reopen confirmation window
 
-
-
 Steps to launch as of this writing (2023 03 30)
 right-click on PySpaceInvaders folder
 scroll to OPEN FOLDER IN TERMINAL and click
 a terminal window will open with a blinking cursor
 at the cursor type "python main.py" and press Enter on keyboard
-game should launch in a window
-game window will scale to full screen and commence
+game will launch and will scale to full screen and commence
+press arrow keys left and right to move bow and arrow
+press space bar to shoot arrows
 press ESC key to quit game at any time
 
 
