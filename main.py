@@ -18,6 +18,7 @@ class PySpaceInvaders:
         # We create a surface in which sprites will be shown
         self.window_surface = pygame.display.set_mode(WINDOW_SIZE, pygame.FULLSCREEN)
 
+
         # Variables for game loop
         self.update_time_delay = 0
         self.draw_time_delay = 0

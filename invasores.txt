@@ -1,4 +1,6 @@
 this text file will be a partial devlog
+
+
 2023 03 25
 added art drawn by Eric Garcia to replace original art
   rename Crown, Church, Ship, Canon, Knight, Soldier, Pyramid to match names in original to minimize chance of breaking game.
@@ -29,3 +31,75 @@ Done:
 add to alien class two more aliens, alien4 and alien5
   config.py, ALIEN_FORMATION and ALIEN_SPRITE_NAMES
   alien.py, beginning line 198 with the creation of the list of aliens
+
+created a branch called fullscreen on GitHub that has correct syntax for FULLSCREEN in main.py line 19. This will require the creation of a KEYUP event to quit the game, or force an unplugging of the Raspberry Pi. I'm not integrating this branch to master yet.
+
+====
+2023 03 26
+downloaded a pygame script to test gamepads to Raspberry Pi. It was updated for pygame v.2 but appears backward compatible.
+
+Tested USB NES gamepad and it worked.
+Tested USB Trooper2 Atari style gamepad and it worked.
+this shows a pathway to adding gamepad events to code. I don't know how much time it will take.
+
+====
+2023 03 27
+new unit test: created a branch on GitHub called scaled; added argument to main.py line 19 "pygame.SCALED"; tested on Raspberry Pi; did not work, we are using pygame v. 1.9 and the SCALED entity is introduced i pygame v.2
+
+verified version of python installed : 3.9.2
+verified version of pyinstaller installed : 5.9.0
+
+====
+2023 03 29
+new unit test, no new branch yet. On a second Raspberry Pi I tried adding key events to the event handler in alien.py. I tested a sys.quit() and a toggle_fullscreen directive. Both worked, but not perfectly -- or, not as expected. Will have to try again.
+
+I also was able to launch the unedited PySpaceInvaders from within Geany on that Raspberry Pi. The OS and model is identical to the show machine.
+
+Today I also received the package with the Raspberry Pi 4 from Vilros which had been ordered by Eric. I will need to test the software on it.
+
+====
+2023 03 30
+I assembled the package from Vilros. For the record here is the link:
+https://vilros.com/products/vilros-raspberry-pi-4-basic-starter-kit-with-fan-cooled-heavy-duty-aluminum-alloy-case?variant=39568353689694
+
+Contents: Raspberry Pi 4B with 4GB RAM, Grey Aluminum passive cooled case, power supply w/ on-off switch, hdmi mini to hdmi adapter, neoprene bag.
+
+I am providing a SanDisk Extreme Pro 32GB microSD card with Raspbery Pi OS installed. I've taken it from what has been the development machine to date. It contains a copy of the game.
+
+Vilros also offers a pre-assembled kit which includes a microSD:
+https://vilros.com/products/vilros-raspberry-pi-4-pre-assembled-complete-starter-kit?variant=39707014922334
+
+I've tested the RasPi 4 with the microSD and it works. This is necessary because this disk has a 32-bit version of the "Bullseye" OS.
+
+I've also tested it with another microSD card (same OS) that I used for yesterday's unit tests and it worked. The toggle_fullscreen worked as it should. It displayed the game, centered on the screen, fullscreen, when toggled on. Yesterday I only saw a black screen. I could toggle back and forth using the F12 key event that I had programmed into an unbranched copy of PySpaceInvaders.
+
+I didn't try the sys.quit. I've learned there exists better syntax, that is to say, one more line of code to insert before the sys.quit directive.
+
+I'm curious to see if I can learn to make a joystick work.
+
+Today I learned that the Aztecs called the Spaniards COYOTL because they were tricksters who stole by night.
+
+I added branch for RESIZABLE with toggle_fullscreen. This may be the branch to merge with the main one (named master). (F12 key toggles)
+
+I added code to enable quitting with the ESCAPE key.
+
+I've added a branch called joystick to begin exploring if joystick events can be added without breaking the code. No luck so far with my first attempt.
+
+====
+2023 04 04
+I took the weekend off for my birthday.
+Yesterday I had dinner with Eric who is in town to give a lecture.
+
+Today I merged the RESIZABLE branch into the master file.
+I also added KEYDOWN event for the ESCAPE key.
+I downloaded the new version and tested it.
+
+the fullscreen toggle doesn't work with the screen orientation rotated to right at any resolution. I have tested with 1080p, 720p, and 480x640.
+
+the fullscreen toggle works well and scales the game with normal orientation and resolutions up to 1080p. I cannot test a higher one.
+
+I will add ESCAPE key event to branch named fullscreen and test that branch.
+
+Fullscreen does not work with screen rotated at any resolution. I will merge the fullscreen branch. It doesn't make any sense to keep the toggle. I will comment that out.
+====
+end of file
