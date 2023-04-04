@@ -149,8 +149,8 @@ class Spaceship:
                     self.is_firing = True
 
 
-                if event.key == pygame.K_F12:
-                    pygame.display.toggle_fullscreen()
+#                if event.key == pygame.K_F12:
+#                    pygame.display.toggle_fullscreen()
 
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
