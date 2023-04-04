@@ -1,0 +1,250 @@
+======
+Steps to prepare screen as of this writing (2023 03 30)
+use mouse to click on raspberry icon in upper left corner of screen
+scroll down menu to PREFERENCES and another sub menu pops out
+scroll down sub menu to SCREEN CONFIGURATION and click
+a window will open named "Screen Layout Editor"
+with mouse click on LAYOUT to open menu
+scroll down to SCREENS and a sub-menu will pop out
+scroll over to HDMI-1 and another sub-menu will pop out
+scroll down to RESOLUTION and yet another sub-menu will pop out
+scroll to 1280 x 1080 and click, the menus will collapse
+with mouse click APPLY button in Screen Layout Editor window
+another window with a confirmation query will open
+your options are 
+	YES to accept changes and reboot now,
+	NO to accept changes and reboot later,
+	close this confirmation window by clicking on "x" in upper right corner
+		click "undo" in Screen Layout Editor to undo request for change
+		click "Apply" in Screen Layout Editor to reopen confirmation window
+
+
+
+Steps to launch as of this writing (2023 03 30)
+right-click on PySpaceInvaders folder
+scroll to OPEN FOLDER IN TERMINAL and click
+a terminal window will open with a blinking cursor
+at the cursor type "python main.py" and press Enter on keyboard
+game should launch in a window
+game window will scale to full screen and commence
+press ESC key to quit game at any time
+
+
+Steps to launch as of this writing (2023 03 20)
+open Terminal
+change directory to /Desktop/PySpaceInvaders
+enter "python main.py" into terminal command line
+
+======
+PySpaceInvaders was sourced from
+https://github.com/Seitoh63/PySpaceInvaders
+
+Art for the sprites was designed by Eric Garcia
+
+The systems were integrated by Rafael Fajardo
+
+Eric and Rafael were brought together by Victoria Lyall
+
+systems:
+	Raspberry Pi 3B+ for initial development
+	Raspberry Pi 4B for completion and archival exhibition
+
+	====	
+	to do
+		try pyinstaller to make exe
+			terminal: pip install -U pyinstaller
+			terminal: pyinstaller your_program.py
+			edit your_program.spec file to ensure dependencies
+		try boot into game with some autoexec script
+	====
+	done
+		replace images in "sprite" folder with those by Eric 
+		preserve file names
+		resample or redraw a couple to match original dimensions
+		may have to adjust code to add to alien class
+			in config.py and alien.py
+		place copy of original images into "sprite alt" folder
+		change resolution of display target to make game bigger
+		commented out main.py lines 91, 92, 132, 133
+
+
+
+===
+Operating SYSTEM INFO
+
+sweat@raspberrypi:~ $ cat /etc/os-release
+PRETTY_NAME="Raspbian GNU/Linux 11 (bullseye)"
+NAME="Raspbian GNU/Linux"
+VERSION_ID="11"
+VERSION="11 (bullseye)"
+VERSION_CODENAME=bullseye
+ID=raspbian
+ID_LIKE=debian
+HOME_URL="http://www.raspbian.org/"
+SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
+BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
+sweat@raspberrypi:~ $ getconf LONG_BIT
+32
+
+===
+CPU SYSTEM INFO, DEV RASPI 3B+
+sweat@raspberrypi:~ $ cat /proc/cpuinfo
+processor	: 0
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 1
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 2
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 3
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+Hardware	: BCM2835
+Revision	: a22082
+Serial		: 000000006f29efb2
+Model		: Raspberry Pi 3 Model B Rev 1.2
+===
+CPU SYSTEM INFO RASPI 4B
+sweat@raspberrypi:~ $ cat /proc/cpuinfo
+processor	: 0
+BogoMIPS	: 108.00
+Features	: fp asimd evtstrm crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd08
+CPU revision	: 3
+
+processor	: 1
+BogoMIPS	: 108.00
+Features	: fp asimd evtstrm crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd08
+CPU revision	: 3
+
+processor	: 2
+BogoMIPS	: 108.00
+Features	: fp asimd evtstrm crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd08
+CPU revision	: 3
+
+processor	: 3
+BogoMIPS	: 108.00
+Features	: fp asimd evtstrm crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd08
+CPU revision	: 3
+
+Hardware	: BCM2835
+Revision	: c03115
+Serial		: 10000000f18a2b11
+Model		: Raspberry Pi 4 Model B Rev 1.5
+===
+
+===
+PYINSTALLER INFO (not yet working)
+
+have to add PATH to/for pyinstaller so that it works.
+find ~ -name pyinstaller -type f
+export ...
+
+
+first attempt
+sweat@raspberrypi:~/Desktop/PySpaceInvaders $ pyinstaller main.py --onefile
+828 INFO: PyInstaller: 5.9.0
+829 INFO: Python: 3.9.2
+843 INFO: Platform: Linux-5.15.61-v7+-armv7l-with-glibc2.31
+845 INFO: wrote /home/sweat/Desktop/PySpaceInvaders/main.spec
+860 INFO: UPX is not available.
+870 INFO: Extending PYTHONPATH with paths
+['/home/sweat/Desktop/PySpaceInvaders']
+2439 INFO: checking Analysis
+2439 INFO: Building Analysis because Analysis-00.toc is non existent
+2439 INFO: Initializing module dependency graph...
+2444 INFO: Caching module graph hooks...
+2516 INFO: Analyzing base_library.zip ...
+8309 INFO: Loading module hook 'hook-encodings.py' from '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks'...
+16741 INFO: Loading module hook 'hook-pickle.py' from '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks'...
+22955 INFO: Loading module hook 'hook-heapq.py' from '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks'...
+27486 INFO: Caching module dependency graph...
+28445 INFO: running Analysis Analysis-00.toc
+28619 INFO: Analyzing /home/sweat/Desktop/PySpaceInvaders/main.py
+30249 INFO: Loading module hook 'hook-xml.py' from '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks'...
+30534 INFO: Loading module hook 'hook-xml.etree.cElementTree.py' from '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks'...
+30806 INFO: Loading module hook 'hook-numpy.py' from '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks'...
+35031 INFO: Loading module hook 'hook-platform.py' from '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks'...
+35997 INFO: Loading module hook 'hook-difflib.py' from '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks'...
+37925 INFO: Loading module hook 'hook-multiprocessing.util.py' from '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks'...
+46332 INFO: Loading module hook 'hook-sysconfig.py' from '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks'...
+54890 INFO: Loading module hook 'hook-OpenGL.py' from '/home/sweat/.local/lib/python3.9/site-packages/_pyinstaller_hooks_contrib/hooks/stdhooks'...
+64096 INFO: Loading module hook 'hook-pkg_resources.py' from '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks'...
+67753 INFO: Processing module hooks...
+69135 INFO: Processing pre-safe import module hook win32com from '/home/sweat/.local/lib/python3.9/site-packages/_pyinstaller_hooks_contrib/hooks/pre_safe_import_module/hook-win32com.py'.
+71081 INFO: Looking for ctypes DLLs
+72097 INFO: Analyzing run-time hooks ...
+72140 INFO: Including run-time hook '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks/rthooks/pyi_rth_pkgres.py'
+72185 INFO: Including run-time hook '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks/rthooks/pyi_rth_inspect.py'
+72194 INFO: Including run-time hook '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks/rthooks/pyi_rth_pkgutil.py'
+72211 INFO: Including run-time hook '/home/sweat/.local/lib/python3.9/site-packages/PyInstaller/hooks/rthooks/pyi_rth_multiprocessing.py'
+72325 INFO: Looking for dynamic libraries
+pygame 1.9.6
+Hello from the pygame community. https://www.pygame.org/contribute.html
+1767 INFO: No OpenGL_accelerate module loaded: No module named 'OpenGL_accelerate'
+84147 INFO: Looking for eggs
+84148 INFO: Python library not among binary dependencies. Performing additional search...
+84360 INFO: Using Python library /lib/arm-linux-gnueabihf/libpython3.9.so.1.0
+84422 INFO: Warnings written to /home/sweat/Desktop/PySpaceInvaders/build/main/warn-main.txt
+84846 INFO: Graph cross-reference written to /home/sweat/Desktop/PySpaceInvaders/build/main/xref-main.html
+85007 INFO: checking PYZ
+85007 INFO: Building PYZ because PYZ-00.toc is non existent
+85008 INFO: Building PYZ (ZlibArchive) /home/sweat/Desktop/PySpaceInvaders/build/main/PYZ-00.pyz
+89333 INFO: Building PYZ (ZlibArchive) /home/sweat/Desktop/PySpaceInvaders/build/main/PYZ-00.pyz completed successfully.
+89412 INFO: checking PKG
+89412 INFO: Building PKG because PKG-00.toc is non existent
+89412 INFO: Building PKG (CArchive) main.pkg
+120547 INFO: Building PKG (CArchive) main.pkg completed successfully.
+120576 INFO: Bootloader /home/sweat/.local/lib/python3.9/site-packages/PyInstaller/bootloader/Linux-32bit-arm/run
+120576 INFO: checking EXE
+120577 INFO: Building EXE because EXE-00.toc is non existent
+120577 INFO: Building EXE from EXE-00.toc
+120577 INFO: Copying bootloader EXE to /home/sweat/Desktop/PySpaceInvaders/dist/main
+120581 INFO: Appending PKG archive to custom ELF section in EXE
+120827 INFO: Building EXE from EXE-00.toc completed successfully.
+===
