@@ -99,5 +99,7 @@ the fullscreen toggle doesn't work with the screen orientation rotated to right 
 the fullscreen toggle works well and scales the game with normal orientation and resolutions up to 1080p. I cannot test a higher one.
 
 I will add ESCAPE key event to branch named fullscreen and test that branch.
+
+Fullscreen does not work with screen rotated at any resolution. I will merge the fullscreen branch. It doesn't make any sense to keep the toggle. I will comment that out.
 ====
 end of file
