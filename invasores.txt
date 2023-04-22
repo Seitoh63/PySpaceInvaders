@@ -101,5 +101,22 @@ the fullscreen toggle works well and scales the game with normal orientation and
 I will add ESCAPE key event to branch named fullscreen and test that branch.
 
 Fullscreen does not work with screen rotated at any resolution. I will merge the fullscreen branch. It doesn't make any sense to keep the toggle. I will comment that out.
+
+====
+2023 04 13
+I gave the hardware loaded with the version denominated 0.0.5 to Eric on the 5th. The next day I tagged and named that version on gitHub as a release. This was my first time issuing a release.
+
+I also put my Raspbery Pi 3B+ back into service with another microSD card loaded with the same Raspberry Pi OS version. I downloaded the 0.0.5 version of the game to that device and put it play in the studio to see how long it could run without crashing.
+
+It ran for 24-36 hours non-stop. I decided to play to win. I accumulated a large number of extra lives. I accumulated so many that I crashed the game. It did not crash the OS, and so the Terminal was still open. I noted the error message, which was an out-of-bounds error in attempting to render a pygame or python surface, presumably attempting to locate a copy of the bow and arrow sprite outside the bounds of game's surface width and height dimensions. I don't know if I can learn to fix this so it won't crash in the future. I advised Eric about this. It has run unplayed without crashing for almost a week since. I want to learn how to log an issue report on gitHub so I can mark it for future investigation. I thought I knew how to do this.
+
+The high score is only recorded while the program is running. It does not read nor write it to a file. There is no way to have a historic high score recorded. I don't know if this would qualify as an issue.
+
+I need to create a PDF document for Eric and the gallery with instructions for installation. I added a HowToLaunch.txt file to this repository and left a copy on the desktop of the computer I gave to Eric. A pdf would include photos as well as text.
+
+====
+2023 04 21
+My son productively broke the game. When the invaders overrun the player, but the player can dodge them, then the game continues without a "game over". My son is clever and figured out how to fix this. We created a new branch to implement the changes.
+
 ====
 end of file
